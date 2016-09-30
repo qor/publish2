@@ -1,6 +1,9 @@
 package version
 
-type Simple struct {
-	Version
-	Schedule
+import "time"
+
+type SimpleVersionMode struct {
+	VersionName    string
+	VersionStartAt *time.Time
+	VersionEndAt   *time.Time
 }
