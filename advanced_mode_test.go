@@ -33,4 +33,10 @@ func TestAdvancedMode(t *testing.T) {
 	product.SetVersion(globalVersion2.ID)
 	product.Description = "product 1 - v2"
 	DB.Save(&product)
+
+	var count int
+	DB.Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 3 {
+		t.Errorf("Should have %v versions for product", 3)
+	}
 }
