@@ -9,12 +9,28 @@ import (
 
 type Product struct {
 	gorm.Model
-	Title   string
-	Content string
+	Title       string
+	Description string
 	version.AdvancedMode
 }
 
+var globalVersion1 = version.QorVersion{Name: "global_v1"}
+var globalVersion2 = version.QorVersion{Name: "global_v2"}
+
+func init() {
+	DB.Save(&globalVersion1)
+	DB.Save(&globalVersion2)
+}
+
 func TestAdvancedMode(t *testing.T) {
-	var product = Product{Title: "article 1", Content: "article 1"}
+	var product = Product{Title: "product 1", Description: "product 1"}
 	DB.Create(&product)
+
+	product.SetVersion(globalVersion1.ID)
+	product.Description = "product 1 - v1"
+	DB.Save(&product)
+
+	product.SetVersion(globalVersion2.ID)
+	product.Description = "product 1 - v2"
+	DB.Save(&product)
 }
