@@ -1,5 +1,5 @@
 package version
 
-type AdvancedVersionMode struct {
+type AdvancedMode struct {
 	VersionID uint
 }
