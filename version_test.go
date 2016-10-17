@@ -64,22 +64,22 @@ func TestVersionsWithSchedule(t *testing.T) {
 	var count int
 	DB.Model(&Post{}).Where("id = ?", post.ID).Count(&count)
 	if count != 1 {
-		t.Errorf("Should have one available post", 1)
+		t.Errorf("Should have one available post")
 	}
 
 	var post1, post2, post3 Post
 	DB.Set("publish:scheduled_time", now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
 	if post1.Body != "post 1" {
-		t.Errorf("should find default version")
+		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
 	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
-	if post3.Body != "post 1 - v1" {
-		t.Errorf("should find first version")
+	if post2.Body != "post 1 - v1" {
+		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
 	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
 	if post3.Body != "post 1 - v2" {
-		t.Errorf("should find second version")
+		t.Errorf("should find second version, but got %v", post3.Body)
 	}
 }

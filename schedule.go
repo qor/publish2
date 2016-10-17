@@ -7,8 +7,8 @@ import (
 )
 
 type Schedule struct {
-	ScheduledStartAt *time.Time
-	ScheduledEndAt   *time.Time
+	ScheduledStartAt *time.Time `gorm:"index"`
+	ScheduledEndAt   *time.Time `gorm:"index"`
 }
 
 func (schedule *Schedule) SetScheduledStartAt(t *time.Time) {

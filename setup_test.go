@@ -5,7 +5,7 @@ import (
 	"github.com/qor/version"
 )
 
-var DB = utils.TestDB().Debug()
+var DB = utils.TestDB()
 
 func init() {
 	models := []interface{}{&Wiki{}, &Post{}}
