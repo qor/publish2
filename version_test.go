@@ -43,27 +43,43 @@ type Post struct {
 }
 
 func TestVersionsWithSchedule(t *testing.T) {
-	var post = Post{Title: "post 1", Body: "post 1"}
+	now := time.Now()
+	oneDayLater := now.Add(24 * time.Hour)
+
+	post := Post{Title: "post 1", Body: "post 1"}
 	DB.Create(&post)
 
 	post.SetVersionName("v1")
 	post.Body = "post 1 - v1"
-	now := time.Now()
-	post.ScheduleStartAt = &now
-	oneDayLater := now.Add(24 * time.Hour)
-	post.ScheduleEndAt = &oneDayLater
+	post.SetScheduledStartAt(&now)
+	post.SetScheduledEndAt(&oneDayLater)
 	DB.Save(&post)
 
 	post.SetVersionName("v2")
 	post.Body = "post 1 - v2"
-	post.ScheduleStartAt = &oneDayLater
-	post.ScheduleEndAt = nil
+	post.SetScheduledStartAt(&oneDayLater)
+	post.SetScheduledEndAt(nil)
 	DB.Save(&post)
 
 	var count int
 	DB.Model(&Post{}).Where("id = ?", post.ID).Count(&count)
-	if count != 3 {
-		t.Errorf("Should have %v versions for post", 3)
+	if count != 1 {
+		t.Errorf("Should have one available post", 1)
 	}
-	// TODO test with scheduled time
+
+	var post1, post2, post3 Post
+	DB.Set("publish:scheduled_time", now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
+	if post1.Body != "post 1" {
+		t.Errorf("should find default version")
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
+	if post3.Body != "post 1 - v1" {
+		t.Errorf("should find first version")
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
+	if post3.Body != "post 1 - v2" {
+		t.Errorf("should find second version")
+	}
 }

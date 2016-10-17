@@ -1,12 +1,16 @@
 package version_test
 
-import "github.com/qor/qor/test/utils"
+import (
+	"github.com/qor/qor/test/utils"
+	"github.com/qor/version"
+)
 
-var DB = utils.TestDB()
+var DB = utils.TestDB().Debug()
 
 func init() {
 	models := []interface{}{&Wiki{}, &Post{}}
 
 	DB.DropTableIfExists(models...)
 	DB.AutoMigrate(models...)
+	version.RegisterCallbacks(DB)
 }
