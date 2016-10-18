@@ -83,3 +83,40 @@ func TestVersionsWithSchedule(t *testing.T) {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
 }
+
+func TestVersionsWithOverlappedSchedule(t *testing.T) {
+	now := time.Now()
+	oneDayAgo := now.Add(-24 * time.Hour)
+	oneDayLater := now.Add(24 * time.Hour)
+
+	post := Post{Title: "post 2", Body: "post 2"}
+	DB.Create(&post)
+
+	post.SetVersionName("v1")
+	post.Body = "post 2 - v1"
+	post.SetScheduledStartAt(&oneDayAgo)
+	post.SetScheduledEndAt(nil)
+	DB.Save(&post)
+
+	post.SetVersionName("v2")
+	post.Body = "post 2 - v2"
+	post.SetScheduledStartAt(&now)
+	post.SetScheduledEndAt(&oneDayLater)
+	DB.Save(&post)
+
+	var post1, post2, post3 Post
+	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
+	if post1.Body != "post 2" {
+		t.Errorf("should find default version, but got %v", post1.Body)
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
+	if post2.Body != "post 2 - v2" {
+		t.Errorf("should find first version, but got %v", post2.Body)
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
+	if post3.Body != "post 2 - v1" {
+		t.Errorf("should find second version, but got %v", post3.Body)
+	}
+}
