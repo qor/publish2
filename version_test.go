@@ -86,23 +86,7 @@ func TestVersionsWithSchedule(t *testing.T) {
 
 func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	now := time.Now()
-	oneDayAgo := now.Add(-24 * time.Hour)
-	oneDayLater := now.Add(24 * time.Hour)
-
-	post := Post{Title: "post 2", Body: "post 2"}
-	DB.Create(&post)
-
-	post.SetVersionName("v1")
-	post.Body = "post 2 - v1"
-	post.SetScheduledStartAt(&oneDayAgo)
-	post.SetScheduledEndAt(nil)
-	DB.Save(&post)
-
-	post.SetVersionName("v2")
-	post.Body = "post 2 - v2"
-	post.SetScheduledStartAt(&now)
-	post.SetScheduledEndAt(&oneDayLater)
-	DB.Save(&post)
+	post := prepareOverlappedPost("post 2")
 
 	var post1, post2, post3 Post
 	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
@@ -119,4 +103,50 @@ func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	if post3.Body != "post 2 - v1" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
+}
+
+func TestVersionsWithOverlappedSchedules(t *testing.T) {
+	now := time.Now()
+	postV1 := prepareOverlappedPost("post 3 - 1")
+	postV2 := prepareOverlappedPost("post 3 - 2")
+	postIDs := []uint{postV1.ID, postV2.ID}
+
+	var count uint
+	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 2 {
+		t.Errorf("should only find 2 valid versions, but got %v", count)
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 2 {
+		t.Errorf("should only find 2 valid versions, but got %v", count)
+	}
+
+	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 2 {
+		t.Errorf("should only find 2 valid versions, but got %v", count)
+	}
+}
+
+func prepareOverlappedPost(name string) *Post {
+	now := time.Now()
+	oneDayAgo := now.Add(-24 * time.Hour)
+	oneDayLater := now.Add(24 * time.Hour)
+
+	post := Post{Title: name, Body: name}
+	DB.Create(&post)
+
+	post.SetVersionName("v1")
+	post.Body = name + " - v1"
+	post.SetScheduledStartAt(&oneDayAgo)
+	post.SetScheduledEndAt(nil)
+	DB.Save(&post)
+
+	post.SetVersionName("v2")
+	post.Body = name + " - v2"
+	post.SetScheduledStartAt(&now)
+	post.SetScheduledEndAt(&oneDayLater)
+	DB.Save(&post)
+
+	return &post
 }
