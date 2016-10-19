@@ -10,6 +10,12 @@ import (
 	"github.com/qor/qor/utils"
 )
 
+const (
+	ScheduleCurrent = "publish:schedule:current"
+	ScheduleStart   = "publish:schedule:start"
+	ScheduleEnd     = "publish:schedule:end"
+)
+
 func IsSchedulableModel(model interface{}) (ok bool) {
 	if model != nil {
 		_, ok = reflect.New(utils.ModelType(model)).Interface().(ScheduledInterface)
@@ -50,7 +56,7 @@ func queryCallback(scope *gorm.Scope) {
 	)
 
 	if isSchedulable {
-		if v, ok := scope.Get("publish:scheduled_time"); ok {
+		if v, ok := scope.Get(ScheduleCurrent); ok {
 			if t, ok := v.(*time.Time); ok {
 				scheduledTime = t
 			} else if t, ok := v.(time.Time); ok {

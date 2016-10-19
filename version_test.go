@@ -68,17 +68,17 @@ func TestVersionsWithSchedule(t *testing.T) {
 	}
 
 	var post1, post2, post3 Post
-	DB.Set("publish:scheduled_time", now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
+	DB.Set(version.ScheduleCurrent, now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
 	if post1.Body != "post 1" {
 		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
+	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
 	if post2.Body != "post 1 - v1" {
 		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
+	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
 	if post3.Body != "post 1 - v2" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
@@ -90,34 +90,34 @@ func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	postV2 := prepareOverlappedPost("post 3 - 2")
 
 	var post1, post2, post3 Post
-	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post1)
+	DB.Set(version.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post1)
 	if post1.Body != postV1.Title {
 		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post2)
+	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post2)
 	if post2.Body != postV1.Title+" - v2" {
 		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post3)
+	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post3)
 	if post3.Body != postV1.Title+" - v1" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
 
 	var count uint
 	var postIDs = []uint{postV1.ID, postV2.ID}
-	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(version.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
