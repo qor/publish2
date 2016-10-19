@@ -28,10 +28,18 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should not find records that not in scheduled")
 	}
 
+	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+		t.Errorf("Should find records that not in scheduled with all mode")
+	}
+
 	discount.SetScheduledEndAt(&oneDayLater)
 	DB.Save(&discount)
 
 	if DB.First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled")
+	}
+
+	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+		t.Errorf("Should find records that in scheduled with all mode")
 	}
 }

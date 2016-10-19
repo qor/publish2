@@ -32,6 +32,11 @@ func TestVersions(t *testing.T) {
 	if count != 1 {
 		t.Errorf("Should only find one version for wiki, but got %v", count)
 	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Model(&Wiki{}).Where("id = ?", wiki.ID).Count(&count)
+	if count != 3 {
+		t.Errorf("Should find all versions for wiki when with multiple mode, but got %v", count)
+	}
 }
 
 type Post struct {
@@ -82,6 +87,11 @@ func TestVersionsWithSchedule(t *testing.T) {
 	if post3.Body != "post 1 - v2" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).Count(&count)
+	if count != 2 {
+		t.Errorf("Should find two valid versions for posts that match current schedule, but got %v", count)
+	}
 }
 
 func TestVersionsWithOverlappedSchedule(t *testing.T) {
@@ -120,6 +130,11 @@ func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 4 {
+		t.Errorf("Should find 4 valid versions for posts that match current schedule, but got %v", count)
 	}
 }
 
@@ -194,5 +209,10 @@ func TestVersionsWithPublishReady(t *testing.T) {
 	DB.Model(&Article{}).Where("id = ?", articleV2.ID).First(&article2)
 	if article2.VersionName != "" {
 		t.Errorf("Should find article w/o version name as no other versions is visible")
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Model(&Article{}).Where("id IN (?)", []uint{articleV1.ID, articleV2.ID}).Count(&count)
+	if count != 3 {
+		t.Errorf("Should find 3 visible versions for article, but got %v", count)
 	}
 }

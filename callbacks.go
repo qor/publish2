@@ -11,9 +11,15 @@ import (
 )
 
 const (
+	VersionMode         = "publish:version:mode"
+	VersionMultipleMode = "multiple"
+
+	ScheduleMode    = "publish:schedule:mode"
 	ScheduleCurrent = "publish:schedule:current"
 	ScheduleStart   = "publish:schedule:start"
 	ScheduleEnd     = "publish:schedule:end"
+
+	VisibleMode = "publish:visible:mode"
 )
 
 func IsSchedulableModel(model interface{}) (ok bool) {
@@ -56,37 +62,50 @@ func queryCallback(scope *gorm.Scope) {
 	)
 
 	if isSchedulable {
-		if v, ok := scope.Get(ScheduleCurrent); ok {
-			if t, ok := v.(*time.Time); ok {
-				scheduledTime = t
-			} else if t, ok := v.(time.Time); ok {
-				scheduledTime = &t
+		switch mode, _ := scope.DB().Get(ScheduleMode); mode {
+		case "all":
+		default:
+			if v, ok := scope.Get(ScheduleCurrent); ok {
+				if t, ok := v.(*time.Time); ok {
+					scheduledTime = t
+				} else if t, ok := v.(time.Time); ok {
+					scheduledTime = &t
+				}
 			}
-		}
 
-		if scheduledTime == nil {
-			now := time.Now()
-			scheduledTime = &now
-		}
+			if scheduledTime == nil {
+				now := time.Now()
+				scheduledTime = &now
+			}
 
-		conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-		conditionValues = append(conditionValues, scheduledTime, scheduledTime)
+			conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+			conditionValues = append(conditionValues, scheduledTime, scheduledTime)
+		}
 	}
 
 	if isPublishReadyable {
-		conditions = append(conditions, "publish_ready = ?")
-		conditionValues = append(conditionValues, true)
+		switch mode, _ := scope.DB().Get(VisibleMode); mode {
+		case "all":
+		default:
+			conditions = append(conditions, "publish_ready = ?")
+			conditionValues = append(conditionValues, true)
+		}
 	}
 
 	if isVersionable {
-		var sql string
-		if len(conditions) == 0 {
-			sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v GROUP BY id)", scope.QuotedTableName())
-		} else {
-			sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE %v GROUP BY id)", scope.QuotedTableName(), strings.Join(conditions, " AND "))
-		}
+		switch mode, _ := scope.DB().Get(VersionMode); mode {
+		case VersionMultipleMode:
+			scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...).Order("version_priority DESC")
+		default:
+			var sql string
+			if len(conditions) == 0 {
+				sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v GROUP BY id)", scope.QuotedTableName())
+			} else {
+				sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE %v GROUP BY id)", scope.QuotedTableName(), strings.Join(conditions, " AND "))
+			}
 
-		scope.Search.Where(sql, conditionValues...).Order("version_priority DESC")
+			scope.Search.Where(sql, conditionValues...).Order("version_priority DESC")
+		}
 	} else {
 		scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 	}
