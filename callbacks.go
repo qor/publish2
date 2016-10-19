@@ -58,8 +58,8 @@ func queryCallback(scope *gorm.Scope) {
 
 	switch {
 	case isSchedulable && isVersionable:
-		sql := fmt.Sprintf("(version_name = '' AND id NOT IN (SELECT id FROM %v WHERE version_name <> '' AND (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?))) OR (version_name <> '' AND (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?))", scope.QuotedTableName())
-		scope.Search.Where(sql, scheduledTime, scheduledTime, scheduledTime, scheduledTime).Order("version_priority DESC")
+		sql := fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?) GROUP BY id)", scope.QuotedTableName())
+		scope.Search.Where(sql, scheduledTime, scheduledTime).Order("version_priority DESC")
 	}
 }
 
