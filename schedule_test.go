@@ -28,6 +28,10 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should not find records that not in scheduled")
 	}
 
+	if DB.Set(version.ScheduleCurrent, oneDayAgo.Add(-time.Hour)).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+		t.Errorf("Should find records that in scheduled with set schedule mode")
+	}
+
 	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that not in scheduled with all mode")
 	}
@@ -41,5 +45,28 @@ func TestSchedule(t *testing.T) {
 
 	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled with all mode")
+	}
+}
+
+func TestScheduleWithStartAndEnd(t *testing.T) {
+	now := time.Now()
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	oneDayLater := time.Now().Add(24 * time.Hour)
+
+	discountV1 := Discount{Name: "discount2 - 1"}
+	discountV1.SetScheduledStartAt(&oneDayAgo)
+	discountV1.SetScheduledEndAt(&now)
+	DB.Create(&discountV1)
+
+	discountV2 := Discount{Name: "discount2 - 2"}
+	oneHourLater := now.Add(time.Hour)
+	discountV2.SetScheduledStartAt(&oneHourLater)
+	discountV2.SetScheduledEndAt(&oneDayLater)
+	DB.Create(&discountV2)
+
+	var count uint
+	DB.Set(version.ScheduleCurrent, now.Add(-time.Hour)).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	if count != 1 {
+		t.Errorf("Should find one discount with scheduled now, but got %v", count)
 	}
 }
