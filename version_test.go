@@ -29,8 +29,8 @@ func TestVersions(t *testing.T) {
 
 	var count int
 	DB.Model(&Wiki{}).Where("id = ?", wiki.ID).Count(&count)
-	if count != 3 {
-		t.Errorf("Should have %v versions for wiki", 3)
+	if count != 1 {
+		t.Errorf("Should only find one version for wiki, but got %v", count)
 	}
 }
 

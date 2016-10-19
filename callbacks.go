@@ -87,26 +87,22 @@ func queryCallback(scope *gorm.Scope) {
 }
 
 func createCallback(scope *gorm.Scope) {
-	if field, ok := scope.FieldByName("VersionName"); ok {
-		field.IsBlank = false
-	}
-
-	if field, ok := scope.FieldByName("VersionPriority"); ok {
-		var scheduledTime *time.Time
-		if scheduled, ok := scope.Value.(ScheduledInterface); ok {
-			scheduledTime = scheduled.GetScheduledStartAt()
-		}
-		if scheduledTime == nil {
-			unix := time.Unix(0, 0)
-			scheduledTime = &unix
+	if IsVersionableModel(scope.Value) {
+		if field, ok := scope.FieldByName("VersionName"); ok {
+			field.IsBlank = false
 		}
 
-		priority := fmt.Sprintf("%v_%v", scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
-		field.Set(priority)
+		updateVersionPriority(scope)
 	}
 }
 
 func updateCallback(scope *gorm.Scope) {
+	if IsVersionableModel(scope.Value) {
+		updateVersionPriority(scope)
+	}
+}
+
+func updateVersionPriority(scope *gorm.Scope) {
 	if field, ok := scope.FieldByName("VersionPriority"); ok {
 		var scheduledTime *time.Time
 		if scheduled, ok := scope.Value.(ScheduledInterface); ok {
