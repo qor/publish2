@@ -3,6 +3,7 @@ package version
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -23,6 +24,13 @@ func IsVersionableModel(model interface{}) (ok bool) {
 	return
 }
 
+func IsPublishReadyableModel(model interface{}) (ok bool) {
+	if model != nil {
+		_, ok = reflect.New(utils.ModelType(model)).Interface().(PublishReadyInterface)
+	}
+	return
+}
+
 func RegisterCallbacks(db *gorm.DB) {
 	db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
 	db.Callback().RowQuery().Before("gorm:query").Register("publish:query", queryCallback)
@@ -32,10 +40,16 @@ func RegisterCallbacks(db *gorm.DB) {
 }
 
 func queryCallback(scope *gorm.Scope) {
-	var scheduledTime *time.Time
-	var isSchedulable, isVersionable bool
+	var (
+		scheduledTime      *time.Time
+		isSchedulable      = IsSchedulableModel(scope.Value)
+		isVersionable      = IsVersionableModel(scope.Value)
+		isPublishReadyable = IsPublishReadyableModel(scope.Value)
+		conditions         []string
+		conditionValues    []interface{}
+	)
 
-	if IsSchedulableModel(scope.Value) {
+	if isSchedulable {
 		if v, ok := scope.Get("publish:scheduled_time"); ok {
 			if t, ok := v.(*time.Time); ok {
 				scheduledTime = t
@@ -49,17 +63,26 @@ func queryCallback(scope *gorm.Scope) {
 			scheduledTime = &now
 		}
 
-		isSchedulable = true
+		conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+		conditionValues = append(conditionValues, scheduledTime, scheduledTime)
 	}
 
-	if IsVersionableModel(scope.Value) {
-		isVersionable = true
+	if isPublishReadyable {
+		conditions = append(conditions, "publish_ready = ?")
+		conditionValues = append(conditionValues, true)
 	}
 
-	switch {
-	case isSchedulable && isVersionable:
-		sql := fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?) GROUP BY id)", scope.QuotedTableName())
-		scope.Search.Where(sql, scheduledTime, scheduledTime).Order("version_priority DESC")
+	if isVersionable {
+		var sql string
+		if len(conditions) == 0 {
+			sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v GROUP BY id)", scope.QuotedTableName())
+		} else {
+			sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE %v GROUP BY id)", scope.QuotedTableName(), strings.Join(conditions, " AND "))
+		}
+
+		scope.Search.Where(sql, conditionValues...).Order("version_priority DESC")
+	} else {
+		scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 	}
 }
 

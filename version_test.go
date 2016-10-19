@@ -86,32 +86,27 @@ func TestVersionsWithSchedule(t *testing.T) {
 
 func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	now := time.Now()
-	post := prepareOverlappedPost("post 2")
+	postV1 := prepareOverlappedPost("post 2 - 1")
+	postV2 := prepareOverlappedPost("post 3 - 2")
 
 	var post1, post2, post3 Post
-	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
-	if post1.Body != "post 2" {
+	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post1)
+	if post1.Body != postV1.Title {
 		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
-	if post2.Body != "post 2 - v2" {
+	DB.Set("publish:scheduled_time", now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post2)
+	if post2.Body != postV1.Title+" - v2" {
 		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
-	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
-	if post3.Body != "post 2 - v1" {
+	DB.Set("publish:scheduled_time", now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post3)
+	if post3.Body != postV1.Title+" - v1" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
-}
-
-func TestVersionsWithOverlappedSchedules(t *testing.T) {
-	now := time.Now()
-	postV1 := prepareOverlappedPost("post 3 - 1")
-	postV2 := prepareOverlappedPost("post 3 - 2")
-	postIDs := []uint{postV1.ID, postV2.ID}
 
 	var count uint
+	var postIDs = []uint{postV1.ID, postV2.ID}
 	DB.Set("publish:scheduled_time", now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
@@ -149,4 +144,55 @@ func prepareOverlappedPost(name string) *Post {
 	DB.Save(&post)
 
 	return &post
+}
+
+type Article struct {
+	gorm.Model
+	Title string
+	Body  string
+	version.Version
+	version.Visible
+}
+
+func TestVersionsWithPublishReady(t *testing.T) {
+	articleV1 := Article{Title: "article 1", Body: "article 1"}
+	articleV1.PublishReady = true
+	DB.Create(&articleV1)
+
+	articleV1.SetVersionName("v1")
+	articleV1.PublishReady = false
+	DB.Save(&articleV1)
+
+	articleV1.SetVersionName("v2")
+	articleV1.PublishReady = true
+	DB.Save(&articleV1)
+
+	articleV2 := Article{Title: "article 2", Body: "article 2"}
+	articleV2.PublishReady = true
+	DB.Create(&articleV2)
+
+	articleV2.SetVersionName("v1")
+	articleV2.PublishReady = false
+	DB.Save(&articleV2)
+
+	articleV2.SetVersionName("v2")
+	articleV2.PublishReady = false
+	DB.Save(&articleV2)
+
+	var count int
+	DB.Model(&Article{}).Where("id IN (?)", []uint{articleV1.ID, articleV2.ID}).Count(&count)
+	if count != 2 {
+		t.Errorf("Should find two articles, but got %v", count)
+	}
+
+	var article1, article2 Article
+	DB.Model(&Article{}).Where("id = ?", articleV1.ID).First(&article1)
+	if article1.VersionName != "v2" {
+		t.Errorf("Should find article v2 as it is latest versible version")
+	}
+
+	DB.Model(&Article{}).Where("id = ?", articleV2.ID).First(&article2)
+	if article2.VersionName != "" {
+		t.Errorf("Should find article w/o version name as no other versions is visible")
+	}
 }
