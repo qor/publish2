@@ -1,7 +1,8 @@
 package version
 
 type Version struct {
-	VersionName string `gorm:"primary_key"`
+	VersionName     string `gorm:"primary_key"`
+	VersionPriority string `gorm:"index"`
 }
 
 func (version *Version) SetVersionName(name string) {

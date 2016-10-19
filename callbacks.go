@@ -26,6 +26,9 @@ func IsVersionableModel(model interface{}) (ok bool) {
 func RegisterCallbacks(db *gorm.DB) {
 	db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
 	db.Callback().RowQuery().Before("gorm:query").Register("publish:query", queryCallback)
+
+	db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
+	db.Callback().Update().Before("gorm:begin_transaction").Register("publish:versions", updateCallback)
 }
 
 func queryCallback(scope *gorm.Scope) {
@@ -56,6 +59,42 @@ func queryCallback(scope *gorm.Scope) {
 	switch {
 	case isSchedulable && isVersionable:
 		sql := fmt.Sprintf("(version_name = '' AND id NOT IN (SELECT id FROM %v WHERE version_name <> '' AND (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?))) OR (version_name <> '' AND (scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?))", scope.QuotedTableName())
-		scope.Search.Where(sql, scheduledTime, scheduledTime, scheduledTime, scheduledTime).Order("scheduled_start_at DESC")
+		scope.Search.Where(sql, scheduledTime, scheduledTime, scheduledTime, scheduledTime).Order("version_priority DESC")
+	}
+}
+
+func createCallback(scope *gorm.Scope) {
+	if field, ok := scope.FieldByName("VersionName"); ok {
+		field.IsBlank = false
+	}
+
+	if field, ok := scope.FieldByName("VersionPriority"); ok {
+		var scheduledTime *time.Time
+		if scheduled, ok := scope.Value.(ScheduledInterface); ok {
+			scheduledTime = scheduled.GetScheduledStartAt()
+		}
+		if scheduledTime == nil {
+			unix := time.Unix(0, 0)
+			scheduledTime = &unix
+		}
+
+		priority := fmt.Sprintf("%v_%v", scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
+		field.Set(priority)
+	}
+}
+
+func updateCallback(scope *gorm.Scope) {
+	if field, ok := scope.FieldByName("VersionPriority"); ok {
+		var scheduledTime *time.Time
+		if scheduled, ok := scope.Value.(ScheduledInterface); ok {
+			scheduledTime = scheduled.GetScheduledStartAt()
+		}
+		if scheduledTime == nil {
+			unix := time.Unix(0, 0)
+			scheduledTime = &unix
+		}
+
+		priority := fmt.Sprintf("%v_%v", scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
+		field.Set(priority)
 	}
 }

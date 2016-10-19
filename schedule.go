@@ -11,6 +11,10 @@ type Schedule struct {
 	ScheduledEndAt   *time.Time `gorm:"index"`
 }
 
+func (schedule *Schedule) GetScheduledStartAt() *time.Time {
+	return schedule.ScheduledStartAt
+}
+
 func (schedule *Schedule) SetScheduledStartAt(t *time.Time) {
 	schedule.ScheduledStartAt = t
 }
@@ -20,7 +24,8 @@ func (schedule *Schedule) SetScheduledEndAt(t *time.Time) {
 }
 
 type ScheduledInterface interface {
-	SetScheduledStartAt(t *time.Time)
+	GetScheduledStartAt() *time.Time
+	SetScheduledStartAt(*time.Time)
 	SetScheduledEndAt(*time.Time)
 }
 
