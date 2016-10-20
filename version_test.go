@@ -138,6 +138,24 @@ func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	}
 }
 
+func TestVersionsWithScheduleRange(t *testing.T) {
+	now := time.Now()
+	postV1 := prepareOverlappedPost("post 5 - 1")
+	postV2 := prepareOverlappedPost("post 5 - 2")
+
+	var count uint
+	var postIDs = []uint{postV1.ID, postV2.ID}
+	DB.Set(version.ScheduleStart, now.Add(-36*time.Hour)).Set(version.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 2 {
+		t.Errorf("should only find 2 valid versions in scheduled range, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(-36*time.Hour)).Set(version.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	if count != 4 {
+		t.Errorf("should only find 4 valid versions in scheduled range with multiple mode, but got %v", count)
+	}
+}
+
 func prepareOverlappedPost(name string) *Post {
 	now := time.Now()
 	oneDayAgo := now.Add(-24 * time.Hour)
