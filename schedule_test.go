@@ -69,4 +69,9 @@ func TestScheduleWithStartAndEnd(t *testing.T) {
 	if count != 1 {
 		t.Errorf("Should find one discount with scheduled now, but got %v", count)
 	}
+
+	DB.Set(version.ScheduleStart, now.Add(-time.Hour)).Set(version.ScheduleEnd, oneDayLater).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	if count != 2 {
+		t.Errorf("Should find two discounts with scheduled time range, but got %v", count)
+	}
 }

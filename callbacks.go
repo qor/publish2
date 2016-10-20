@@ -53,7 +53,6 @@ func RegisterCallbacks(db *gorm.DB) {
 
 func queryCallback(scope *gorm.Scope) {
 	var (
-		scheduledTime      *time.Time
 		isSchedulable      = IsSchedulableModel(scope.Value)
 		isVersionable      = IsVersionableModel(scope.Value)
 		isPublishReadyable = IsPublishReadyableModel(scope.Value)
@@ -65,21 +64,51 @@ func queryCallback(scope *gorm.Scope) {
 		switch mode, _ := scope.DB().Get(ScheduleMode); mode {
 		case "all":
 		default:
-			if v, ok := scope.Get(ScheduleCurrent); ok {
+			var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
+
+			if v, ok := scope.Get(ScheduleStart); ok {
 				if t, ok := v.(*time.Time); ok {
-					scheduledTime = t
+					scheduledStartTime = t
 				} else if t, ok := v.(time.Time); ok {
-					scheduledTime = &t
+					scheduledStartTime = &t
+				}
+
+				if scheduledStartTime != nil {
+					conditions = append(conditions, "(scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+					conditionValues = append(conditionValues, scheduledStartTime)
 				}
 			}
 
-			if scheduledTime == nil {
-				now := time.Now()
-				scheduledTime = &now
+			if v, ok := scope.Get(ScheduleEnd); ok {
+				if t, ok := v.(*time.Time); ok {
+					scheduledEndTime = t
+				} else if t, ok := v.(time.Time); ok {
+					scheduledEndTime = &t
+				}
+
+				if scheduledEndTime != nil {
+					conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?)")
+					conditionValues = append(conditionValues, scheduledEndTime)
+				}
 			}
 
-			conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-			conditionValues = append(conditionValues, scheduledTime, scheduledTime)
+			if len(conditions) == 0 {
+				if v, ok := scope.Get(ScheduleCurrent); ok {
+					if t, ok := v.(*time.Time); ok {
+						scheduledCurrentTime = t
+					} else if t, ok := v.(time.Time); ok {
+						scheduledCurrentTime = &t
+					}
+				}
+
+				if scheduledCurrentTime == nil {
+					now := time.Now()
+					scheduledCurrentTime = &now
+				}
+
+				conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+				conditionValues = append(conditionValues, scheduledCurrentTime, scheduledCurrentTime)
+			}
 		}
 	}
 
