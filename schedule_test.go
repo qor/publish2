@@ -75,3 +75,39 @@ func TestScheduleWithStartAndEnd(t *testing.T) {
 		t.Errorf("Should find two discounts with scheduled time range, but got %v", count)
 	}
 }
+
+type Campaign struct {
+	gorm.Model
+	Name string
+	version.Schedule
+	version.Visible
+}
+
+func TestScheduleWithVisible(t *testing.T) {
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
+	oneDayLater := time.Now().Add(24 * time.Hour)
+
+	campaign := Campaign{Name: "campaign 1"}
+	campaign.SetScheduledStartAt(&oneDayAgo)
+	campaign.SetScheduledEndAt(&oneDayLater)
+	DB.Create(&campaign)
+
+	if !DB.First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+		t.Errorf("Should not be able to find created record that not visible")
+	}
+
+	if DB.Set(version.VisibleMode, "all").First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+		t.Errorf("Should be able to find created record that not visible when with visible mode on")
+	}
+
+	campaign.SetPublishReady(true)
+	DB.Save(&campaign)
+
+	if DB.First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+		t.Errorf("Should be able to find created record that visible")
+	}
+
+	if !DB.Set(version.ScheduleCurrent, oneDayLater.Add(time.Hour)).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+		t.Errorf("Should not be able to find created record that not in schedule")
+	}
+}

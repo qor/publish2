@@ -8,7 +8,7 @@ import (
 var DB = utils.TestDB()
 
 func init() {
-	models := []interface{}{&Wiki{}, &Post{}, &Article{}, &Discount{}}
+	models := []interface{}{&Wiki{}, &Post{}, &Article{}, &Discount{}, &User{}, &Campaign{}}
 
 	DB.DropTableIfExists(models...)
 	DB.AutoMigrate(models...)
