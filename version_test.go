@@ -234,3 +234,69 @@ func TestVersionsWithPublishReady(t *testing.T) {
 		t.Errorf("Should find 3 visible versions for article, but got %v", count)
 	}
 }
+
+type Product struct {
+	gorm.Model
+	Name string
+	Body string
+	version.Version
+	version.Schedule
+	version.Visible
+}
+
+func TestPostWithVersionAndScheduleAndPublishReady(t *testing.T) {
+	name := "product 1"
+	now := time.Now()
+	oneDayAgo := now.Add(-24 * time.Hour)
+	oneDayLater := now.Add(24 * time.Hour)
+
+	product := Product{Name: name}
+	product.SetPublishReady(true)
+	DB.Create(&product)
+
+	product.SetVersionName("v1")
+	product.Body = name + " - v1"
+	product.SetScheduledStartAt(&oneDayAgo)
+	product.SetScheduledEndAt(&now)
+	DB.Save(&product)
+
+	product.SetVersionName("v2")
+	product.Body = name + " - v2"
+	product.SetPublishReady(false)
+	product.SetScheduledStartAt(&oneDayAgo)
+	product.SetScheduledEndAt(&oneDayLater)
+	DB.Save(&product)
+
+	product.SetVersionName("v3")
+	product.Body = name + " - v3"
+	product.SetPublishReady(true)
+	product.SetScheduledStartAt(&now)
+	product.SetScheduledEndAt(&oneDayLater)
+	DB.Save(&product)
+
+	var count int
+	DB.Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 1 {
+		t.Errorf("Should only find one valid product, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(-time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 2 {
+		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 2 {
+		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(time.Hour)).Set(version.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 2 {
+		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
+	}
+
+	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(-time.Hour)).Set(version.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	if count != 3 {
+		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
+	}
+}
