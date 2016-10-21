@@ -32,7 +32,7 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should find records that in scheduled with set schedule mode")
 	}
 
-	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(version.ScheduleMode, version.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that not in scheduled with all mode")
 	}
 
@@ -43,7 +43,7 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should find records that in scheduled")
 	}
 
-	if DB.Set(version.ScheduleMode, "all").First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(version.ScheduleMode, version.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled with all mode")
 	}
 }
@@ -96,7 +96,7 @@ func TestScheduleWithVisible(t *testing.T) {
 		t.Errorf("Should not be able to find created record that not visible")
 	}
 
-	if DB.Set(version.VisibleMode, "all").First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+	if DB.Set(version.VisibleMode, version.ModeOff).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
 		t.Errorf("Should be able to find created record that not visible when with visible mode on")
 	}
 

@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	ModeOff             = "off"
 	VersionMode         = "publish:version:mode"
 	VersionMultipleMode = "multiple"
 
@@ -62,7 +63,7 @@ func queryCallback(scope *gorm.Scope) {
 
 	if isSchedulable {
 		switch mode, _ := scope.DB().Get(ScheduleMode); mode {
-		case "all":
+		case ModeOff:
 		default:
 			var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
 
@@ -114,7 +115,7 @@ func queryCallback(scope *gorm.Scope) {
 
 	if isPublishReadyable {
 		switch mode, _ := scope.DB().Get(VisibleMode); mode {
-		case "all":
+		case ModeOff:
 		default:
 			conditions = append(conditions, "publish_ready = ?")
 			conditionValues = append(conditionValues, true)

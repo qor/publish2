@@ -21,7 +21,7 @@ func TestPublishReady(t *testing.T) {
 		t.Errorf("Should not able to find created record when publish not ready")
 	}
 
-	if DB.Set(version.VisibleMode, "all").First(&User{}, "id = ?", user.ID).RecordNotFound() {
+	if DB.Set(version.VisibleMode, version.ModeOff).First(&User{}, "id = ?", user.ID).RecordNotFound() {
 		t.Errorf("Should be able to find created record with visible mode `all`")
 	}
 
