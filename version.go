@@ -1,4 +1,4 @@
-package version
+package publish2
 
 type Version struct {
 	VersionName     string `gorm:"primary_key"`

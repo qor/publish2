@@ -1,17 +1,17 @@
-package version_test
+package publish2_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/qor/version"
+	"github.com/qor/publish2"
 )
 
 type Discount struct {
 	gorm.Model
 	Name string
-	version.Schedule
+	publish2.Schedule
 }
 
 func TestSchedule(t *testing.T) {
@@ -28,11 +28,11 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should not find records that not in scheduled")
 	}
 
-	if DB.Set(version.ScheduleCurrent, oneDayAgo.Add(-time.Hour)).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(publish2.ScheduleCurrent, oneDayAgo.Add(-time.Hour)).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled with set schedule mode")
 	}
 
-	if DB.Set(version.ScheduleMode, version.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(publish2.ScheduleMode, publish2.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that not in scheduled with all mode")
 	}
 
@@ -43,7 +43,7 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should find records that in scheduled")
 	}
 
-	if DB.Set(version.ScheduleMode, version.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(publish2.ScheduleMode, publish2.ModeOff).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled with all mode")
 	}
 }
@@ -65,12 +65,12 @@ func TestScheduleWithStartAndEnd(t *testing.T) {
 	DB.Create(&discountV2)
 
 	var count uint
-	DB.Set(version.ScheduleCurrent, now.Add(-time.Hour)).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	DB.Set(publish2.ScheduleCurrent, now.Add(-time.Hour)).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
 	if count != 1 {
 		t.Errorf("Should find one discount with scheduled now, but got %v", count)
 	}
 
-	DB.Set(version.ScheduleStart, now.Add(-time.Hour)).Set(version.ScheduleEnd, oneDayLater).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	DB.Set(publish2.ScheduleStart, now.Add(-time.Hour)).Set(publish2.ScheduleEnd, oneDayLater).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
 	if count != 2 {
 		t.Errorf("Should find two discounts with scheduled time range, but got %v", count)
 	}
@@ -79,8 +79,8 @@ func TestScheduleWithStartAndEnd(t *testing.T) {
 type Campaign struct {
 	gorm.Model
 	Name string
-	version.Schedule
-	version.Visible
+	publish2.Schedule
+	publish2.Visible
 }
 
 func TestScheduleWithVisible(t *testing.T) {
@@ -96,7 +96,7 @@ func TestScheduleWithVisible(t *testing.T) {
 		t.Errorf("Should not be able to find created record that not visible")
 	}
 
-	if DB.Set(version.VisibleMode, version.ModeOff).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+	if DB.Set(publish2.VisibleMode, publish2.ModeOff).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
 		t.Errorf("Should be able to find created record that not visible when with visible mode on")
 	}
 
@@ -107,7 +107,7 @@ func TestScheduleWithVisible(t *testing.T) {
 		t.Errorf("Should be able to find created record that visible")
 	}
 
-	if !DB.Set(version.ScheduleCurrent, oneDayLater.Add(time.Hour)).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+	if !DB.Set(publish2.ScheduleCurrent, oneDayLater.Add(time.Hour)).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
 		t.Errorf("Should not be able to find created record that not in schedule")
 	}
 }

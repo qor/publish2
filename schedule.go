@@ -1,4 +1,4 @@
-package version
+package publish2
 
 import (
 	"time"

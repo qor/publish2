@@ -1,18 +1,18 @@
-package version_test
+package publish2_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/qor/version"
+	"github.com/qor/publish2"
 )
 
 type Wiki struct {
 	gorm.Model
 	Title string
 	Body  string
-	version.Version
+	publish2.Version
 }
 
 func TestVersions(t *testing.T) {
@@ -33,7 +33,7 @@ func TestVersions(t *testing.T) {
 		t.Errorf("Should only find one version for wiki, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Model(&Wiki{}).Where("id = ?", wiki.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Model(&Wiki{}).Where("id = ?", wiki.ID).Count(&count)
 	if count != 3 {
 		t.Errorf("Should find all versions for wiki when with multiple mode, but got %v", count)
 	}
@@ -43,8 +43,8 @@ type Post struct {
 	gorm.Model
 	Title string
 	Body  string
-	version.Version
-	version.Schedule
+	publish2.Version
+	publish2.Schedule
 }
 
 func TestVersionsWithSchedule(t *testing.T) {
@@ -73,22 +73,22 @@ func TestVersionsWithSchedule(t *testing.T) {
 	}
 
 	var post1, post2, post3 Post
-	DB.Set(version.ScheduleCurrent, now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
+	DB.Set(publish2.ScheduleCurrent, now.Add(-24*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post1)
 	if post1.Body != "post 1" {
 		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
+	DB.Set(publish2.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post2)
 	if post2.Body != "post 1 - v1" {
 		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
+	DB.Set(publish2.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).First(&post3)
 	if post3.Body != "post 1 - v2" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", post.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("Should find two valid versions for posts that match current schedule, but got %v", count)
 	}
@@ -100,39 +100,39 @@ func TestVersionsWithOverlappedSchedule(t *testing.T) {
 	postV2 := prepareOverlappedPost("post 3 - 2")
 
 	var post1, post2, post3 Post
-	DB.Set(version.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post1)
+	DB.Set(publish2.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post1)
 	if post1.Body != postV1.Title {
 		t.Errorf("should find default version, but got %v", post1.Body)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post2)
+	DB.Set(publish2.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post2)
 	if post2.Body != postV1.Title+" - v2" {
 		t.Errorf("should find first version, but got %v", post2.Body)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post3)
+	DB.Set(publish2.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id = ?", postV1.ID).First(&post3)
 	if post3.Body != postV1.Title+" - v1" {
 		t.Errorf("should find second version, but got %v", post3.Body)
 	}
 
 	var count uint
 	var postIDs = []uint{postV1.ID, postV2.ID}
-	DB.Set(version.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.ScheduleCurrent, now.Add(-36*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.ScheduleCurrent, now.Add(6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
 
-	DB.Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(25*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 4 {
 		t.Errorf("Should find 4 valid versions for posts that match current schedule, but got %v", count)
 	}
@@ -145,12 +145,12 @@ func TestVersionsWithScheduleRange(t *testing.T) {
 
 	var count uint
 	var postIDs = []uint{postV1.ID, postV2.ID}
-	DB.Set(version.ScheduleStart, now.Add(-36*time.Hour)).Set(version.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.ScheduleStart, now.Add(-36*time.Hour)).Set(publish2.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 2 {
 		t.Errorf("should only find 2 valid versions in scheduled range, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(-36*time.Hour)).Set(version.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(-36*time.Hour)).Set(publish2.ScheduleEnd, now.Add(-6*time.Hour)).Model(&Post{}).Where("id IN (?)", postIDs).Count(&count)
 	if count != 4 {
 		t.Errorf("should only find 4 valid versions in scheduled range with multiple mode, but got %v", count)
 	}
@@ -183,8 +183,8 @@ type Article struct {
 	gorm.Model
 	Title string
 	Body  string
-	version.Version
-	version.Visible
+	publish2.Version
+	publish2.Visible
 }
 
 func TestVersionsWithPublishReady(t *testing.T) {
@@ -229,7 +229,7 @@ func TestVersionsWithPublishReady(t *testing.T) {
 		t.Errorf("Should find article w/o version name as no other versions is visible")
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Model(&Article{}).Where("id IN (?)", []uint{articleV1.ID, articleV2.ID}).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Model(&Article{}).Where("id IN (?)", []uint{articleV1.ID, articleV2.ID}).Count(&count)
 	if count != 3 {
 		t.Errorf("Should find 3 visible versions for article, but got %v", count)
 	}
@@ -239,9 +239,9 @@ type Product struct {
 	gorm.Model
 	Name string
 	Body string
-	version.Version
-	version.Schedule
-	version.Visible
+	publish2.Version
+	publish2.Schedule
+	publish2.Visible
 }
 
 func TestPostWithVersionAndScheduleAndPublishReady(t *testing.T) {
@@ -280,22 +280,22 @@ func TestPostWithVersionAndScheduleAndPublishReady(t *testing.T) {
 		t.Errorf("Should only find one valid product, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(-time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(-time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleCurrent, now.Add(time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(time.Hour)).Set(version.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	DB.Set(version.VersionMode, version.VersionMultipleMode).Set(version.ScheduleStart, now.Add(-time.Hour)).Set(version.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(-time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&Product{}).Where("id = ?", product.ID).Count(&count)
 	if count != 3 {
 		t.Errorf("Should only find two valid product when scheduled time, but got %v", count)
 	}

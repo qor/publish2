@@ -1,8 +1,8 @@
-package version_test
+package publish2_test
 
 import (
+	"github.com/qor/publish2"
 	"github.com/qor/qor/test/utils"
-	"github.com/qor/version"
 )
 
 var DB = utils.TestDB()
@@ -12,5 +12,5 @@ func init() {
 
 	DB.DropTableIfExists(models...)
 	DB.AutoMigrate(models...)
-	version.RegisterCallbacks(DB)
+	publish2.RegisterCallbacks(DB)
 }
