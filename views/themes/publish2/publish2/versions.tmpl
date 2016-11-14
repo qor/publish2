@@ -1,1 +1,18 @@
-versions
+<table>
+  <thead>
+    <th>{{t "qor_publish2.attributes.version_name" "Version Name"}}</th>
+    <th>{{t "qor_publish2.attributes.start_at" "Start At"}}</th>
+    <th>{{t "qor_publish2.attributes.end_at" "End At"}}</th>
+    <th>{{t "qor_publish2.attributes.publish_ready" "Publish Ready"}}</th>
+  </thead>
+  <tbody>
+  {{range $result := .Result}}
+    <tr>
+      <th>{{$result.GetVersionName}}</th>
+      <th>{{$result.GetScheduledStartAt}}</th>
+      <th>{{$result.GetScheduledEndAt}}</th>
+      <th>{{$result.GetPublishReady}}</th>
+    </tr>
+  {{end}}
+  </tbody>
+</table>

@@ -19,6 +19,10 @@ func (schedule *Schedule) SetScheduledStartAt(t *time.Time) {
 	schedule.ScheduledStartAt = t
 }
 
+func (schedule *Schedule) GetScheduledEndAt() *time.Time {
+	return schedule.ScheduledEndAt
+}
+
 func (schedule *Schedule) SetScheduledEndAt(t *time.Time) {
 	schedule.ScheduledEndAt = t
 }
@@ -26,6 +30,7 @@ func (schedule *Schedule) SetScheduledEndAt(t *time.Time) {
 type ScheduledInterface interface {
 	GetScheduledStartAt() *time.Time
 	SetScheduledStartAt(*time.Time)
+	GetScheduledEndAt() *time.Time
 	SetScheduledEndAt(*time.Time)
 }
 

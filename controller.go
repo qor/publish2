@@ -7,6 +7,8 @@ type controller struct {
 }
 
 func (controller) Versions(context *admin.Context) {
-	result := context.Render("publish2/versions", nil)
-	context.Writer.Write([]byte(result))
+	if record, err := context.FindOne(); err == nil {
+		result := context.Render("publish2/versions", record)
+		context.Writer.Write([]byte(result))
+	}
 }
