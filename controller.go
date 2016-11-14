@@ -1,14 +1,19 @@
 package publish2
 
-import "github.com/qor/admin"
+import (
+	"fmt"
+
+	"github.com/qor/admin"
+)
 
 type controller struct {
 	Resource *admin.Resource
 }
 
 func (controller) Versions(context *admin.Context) {
-	if record, err := context.FindOne(); err == nil {
-		result := context.Render("publish2/versions", record)
-		context.Writer.Write([]byte(result))
-	}
+	records := context.Resource.NewSlice()
+	context.GetDB().Set(VersionMode, VersionMultipleMode).Set(ScheduleMode, ModeOff).Set(VisibleMode, ModeOff).Find(records, fmt.Sprintf("%v = ?", context.Resource.PrimaryDBName()), context.ResourceID)
+
+	result := context.Render("publish2/versions", records)
+	context.Writer.Write([]byte(result))
 }
