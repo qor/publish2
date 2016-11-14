@@ -10,7 +10,7 @@ type controller struct {
 	Resource *admin.Resource
 }
 
-func (ctr controller) Publish(context *admin.Context) {
+func (ctr controller) Dashboard(context *admin.Context) {
 	context.Execute("publish2/dashboard", ctr.Resource)
 }
 

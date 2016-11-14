@@ -50,11 +50,22 @@ func enablePublishMode(res resource.Resourcer) {
 type Publish struct {
 }
 
-func (Publish) ConfigureQorResource(res resource.Resourcer) {
+func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
+		if res.Config.Name == "" {
+			res.Name = "Schedule"
+		}
+
+		if len(res.Config.Menu) == 0 {
+			res.Config.Menu = []string{"Publishing"}
+		}
+
 		Admin := res.GetAdmin()
+		//TODO make it configable
+		Admin.AddResource(&ScheduleEvent{}, &admin.Config{Name: "Event", Menu: res.Config.Menu, Priority: -1})
+		Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
 
 		ctr := controller{Resource: res}
-		Admin.GetRouter().Get(res.ToParam(), ctr.Publish)
+		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard)
 	}
 }
