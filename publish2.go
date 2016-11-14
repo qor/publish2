@@ -46,3 +46,15 @@ func enablePublishMode(res resource.Resourcer) {
 		}
 	}
 }
+
+type Publish struct {
+}
+
+func (Publish) ConfigureQorResource(res resource.Resourcer) {
+	if res, ok := res.(*admin.Resource); ok {
+		Admin := res.GetAdmin()
+
+		ctr := controller{Resource: res}
+		Admin.GetRouter().Get(res.ToParam(), ctr.Publish)
+	}
+}
