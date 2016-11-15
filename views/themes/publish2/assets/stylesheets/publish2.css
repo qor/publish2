@@ -1,3 +1,1 @@
-.publish2 {
-  color: red;
-}
+.qor-table__inner-list{background-color:#f5f5f5}.qor-table__inner-list:hover{background-color:#f5f5f5!important}.qor-table__inner-list>td{padding:0!important}.qor-table__inner-list .qor-table__inner-block{position:relative!important;padding:24px}.qor-table__inner-list .qor-table__inner-block::after,.qor-table__inner-list .qor-table__inner-block::before{content:'';position:absolute;width:10px;top:0;bottom:0;background-color:#f5f5f5}.qor-table__inner-list .qor-table__inner-block::before{left:-10px}.qor-table__inner-list .qor-table__inner-block::after{right:-10px}.qor-table__version{width:100%;z-index:10;box-shadow:0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12)}

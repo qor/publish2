@@ -1,17 +1,30 @@
-<table>
+<table class="mdl-data-table mdl-js-data-table qor-table__version">
   <thead>
-    <th>{{t "qor_publish2.attributes.version_name" "Version Name"}}</th>
-    <th>{{t "qor_publish2.attributes.start_at" "Start At"}}</th>
-    <th>{{t "qor_publish2.attributes.end_at" "End At"}}</th>
-    <th>{{t "qor_publish2.attributes.publish_ready" "Publish Ready"}}</th>
+    <th class="mdl-data-table__cell--non-numeric">{{t "qor_publish2.attributes.version_name" "Version Name"}}</th>
+    <th class="mdl-data-table__cell--non-numeric">{{t "qor_publish2.attributes.start_at" "Start At"}}</th>
+    <th class="mdl-data-table__cell--non-numeric">{{t "qor_publish2.attributes.end_at" "End At"}}</th>
+    <th class="mdl-data-table__cell--non-numeric">{{t "qor_publish2.attributes.publish_ready" "Publish Ready"}}</th>
+    <th class="mdl-data-table__cell--non-numeric qor-table__actions"></th>
   </thead>
   <tbody>
   {{range $result := .Result}}
     <tr>
-      <th>{{$result.GetVersionName}}</th>
-      <th>{{$result.GetScheduledStartAt}}</th>
-      <th>{{$result.GetScheduledEndAt}}</th>
-      <th>{{$result.GetPublishReady}}</th>
+      <td class="mdl-data-table__cell--non-numeric">{{$result.GetVersionName}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{$result.GetScheduledStartAt}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{$result.GetScheduledEndAt}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{$result.GetPublishReady}}</td>
+      <td class="mdl-data-table__cell--non-numeric qor-table__actions">
+        <button id="actions-for-{{$result.GetVersionName}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="actions-for-{{$result.GetVersionName}}">
+            <li class="mdl-menu__item" qor-icon-name="Delete">
+                <a href="#" target="_blank">
+                  Delete
+                </a>
+            </li>
+        </ul>
+      </td>
     </tr>
   {{end}}
   </tbody>
