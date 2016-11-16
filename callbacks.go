@@ -128,10 +128,19 @@ func queryCallback(scope *gorm.Scope) {
 			scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...).Order("version_priority DESC")
 		default:
 			var sql string
+			var primaryKeys []string
+
+			for _, primaryField := range scope.PrimaryFields() {
+				if primaryField.DBName != "version_name" {
+					primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
+				}
+			}
+
+			primaryKeyCondition := strings.Join(primaryKeys, ",")
 			if len(conditions) == 0 {
-				sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v GROUP BY id)", scope.QuotedTableName())
+				sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition)
 			} else {
-				sql = fmt.Sprintf("(id, version_priority) IN (SELECT id, MAX(version_priority) FROM %v WHERE %v GROUP BY id)", scope.QuotedTableName(), strings.Join(conditions, " AND "))
+				sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
 			}
 
 			scope.Search.Where(sql, conditionValues...).Order("version_priority DESC")
