@@ -244,7 +244,7 @@ type Product struct {
 	publish2.Visible
 }
 
-func TestPostWithVersionAndScheduleAndPublishReady(t *testing.T) {
+func TestProductWithVersionAndScheduleAndPublishReady(t *testing.T) {
 	name := "product 1"
 	now := time.Now()
 	oneDayAgo := now.Add(-24 * time.Hour)

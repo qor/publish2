@@ -125,7 +125,7 @@ func queryCallback(scope *gorm.Scope) {
 	if isVersionable {
 		switch mode, _ := scope.DB().Get(VersionMode); mode {
 		case VersionMultipleMode:
-			scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...).Order("version_priority DESC")
+			scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 		default:
 			var sql string
 			var primaryKeys []string
@@ -143,8 +143,10 @@ func queryCallback(scope *gorm.Scope) {
 				sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
 			}
 
-			scope.Search.Where(sql, conditionValues...).Order("version_priority DESC")
+			scope.Search.Where(sql, conditionValues...)
 		}
+
+		scope.Search.Order("version_priority DESC")
 	} else {
 		scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 	}
