@@ -17,13 +17,24 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_CHANGE = 'change.' + NAMESPACE;
   var CLASS_VERSION_LINK = '.qor-publish2__version';
+
   var VERSION_LIST = 'qor-table__inner-list';
   var VERSION_BLOCK = 'qor-table__inner-block';
   var CLASS_VERSION_LIST = '.' + VERSION_LIST;
   var CLASS_VERSION_BLOCK = '.' + VERSION_BLOCK;
+
   var CLASS_TABLE = '.qor-table';
+
+  var CLASS_PUBLISH_READY = '[name="QorResource.PublishReady"]';
+  var CLASS_SCHEDULED_STARTAT = '[name="QorResource.ScheduledStartAt"]';
+  var CLASS_SCHEDULED_ENDAT = '[name="QorResource.ScheduledEndAt"]';
+
+  var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
+
   var IS_MEDIALIBRARY = 'qor-table--medialibrary';
+  var IS_SHOW_VERSION = 'is-showing';
 
   function QorPublish2(element, options) {
     this.$element = $(element);
@@ -35,17 +46,44 @@
     constructor: QorPublish2,
 
     init: function () {
+      this.actionType = {
+        'scheduledstart' : CLASS_SCHEDULED_STARTAT,
+        'scheduledend' : CLASS_SCHEDULED_ENDAT,
+        'publishready': CLASS_PUBLISH_READY
+      };
       this.bind();
     },
 
     bind: function () {
       $document
-        .on(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this));
+        .on(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
+        .on(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this));
     },
 
     unbind: function () {
       $document
-        .off(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this));
+        .off(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
+        .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this));
+    },
+
+    action: function (e) {
+      var $element = $(e.target),
+          isCheckbox = $element.prop('type') == 'checkbox',
+          currentValue = $element.val(),
+          $target = $(this.actionType[$element.data().actionType]),
+          $checkboxLabel = $target.closest('label');
+
+      if (!$target.size()) {
+        return;
+      }
+
+      if (isCheckbox) {
+        $target.prop('checked', $element.is(':checked'));
+        $element.is(':checked') ? $checkboxLabel.addClass('is-checked') : $checkboxLabel.removeClass('is-checked');
+      } else {
+        $target.val(currentValue);
+      }
+
     },
 
     loadPublishVersion: function (e) {
@@ -60,13 +98,14 @@
           $version = $('<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>'),
           $list;
 
+      $(CLASS_VERSION_LIST).remove();
+      $table.find('tr').removeClass(IS_SHOW_VERSION);
+
       if (hasVersion) {
-        $(CLASS_VERSION_LIST).remove();
         return false;
       }
 
-      $(CLASS_VERSION_LIST).remove();
-      $tr.after(newRow);
+      $tr.addClass(IS_SHOW_VERSION).after(newRow);
       $list = $(CLASS_VERSION_LIST).find('td');
 
       $version.appendTo($list).trigger('enable');
@@ -81,6 +120,20 @@
     destroy: function () {
       this.unbind();
       this.$element.removeData(NAMESPACE);
+    }
+
+  };
+
+  $.fn.qorSliderAfterShow.initPublishForm = function () {
+
+    if (!$('.qor-pulish2__action').size()) {
+      return;
+    }
+
+    var classNames = [CLASS_SCHEDULED_STARTAT, CLASS_SCHEDULED_ENDAT, CLASS_PUBLISH_READY];
+
+    for (var i = 0; i < classNames.length; i++) {
+      $(classNames[i]).closest('.qor-form-section').hide();
     }
 
   };

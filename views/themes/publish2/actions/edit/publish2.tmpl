@@ -1,15 +1,15 @@
-<div class="qor-form-container">
+<div class="qor-form-container qor-pulish2__action">
   <div class="qor-form-section-rows qor-section-columns-2 clearfix">
     <div class="qor-field">
       <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-        <label class="qor-field__label mdl-textfield__label" for="a">
+        <label class="qor-field__label mdl-textfield__label" for="">
           Version Name
         </label>
 
         <div class="qor-field__show"></div>
 
         <div class="qor-field__edit">
-          <input class="mdl-textfield__input" type="text" id="" name="" value="">
+          <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" id="" name="" value="">
         </div>
       </div>
     </div>
@@ -24,7 +24,7 @@
 
         <div class="qor-field__edit">
           <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
-            <input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
+            <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready">
             <span class="mdl-switch__label"></span>
           </label>
         </div>
@@ -43,7 +43,7 @@
         <div class="qor-field__show"></div>
 
         <div class="qor-field__edit qor-field__datetimepicker">
-          <input class="mdl-textfield__input qor-datetimepicker__input" placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="">
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input" data-action-type="scheduledstart" placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="">
 
           <div>
             <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
@@ -68,7 +68,7 @@
         </div>
 
         <div class="qor-field__edit qor-field__datetimepicker">
-          <input class="mdl-textfield__input qor-datetimepicker__input" placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="">
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="">
           <div>
             <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
               <i class="material-icons">date_range</i>
@@ -86,18 +86,31 @@
 
   <div class="qor-form-section-rows qor-section-columns-2 clearfix">
     <div class="qor-field">
-      <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-        <label class="qor-field__label mdl-textfield__label" for="a">
+        <label class="qor-field__label">
           For Event
         </label>
 
         <div class="qor-field__show"></div>
 
-        <div class="qor-field__edit">
-          Select one template
+        <div class="qor-field__block qor-field__edit qor-field__selectone" data-toggle="qor.selectone">
+          <a href="javascript://" class="mdl-button mdl-button--colored qor-field__selectone-trigger" data-select-modal="one" data-selectone-url="/admin/events">{{t "qor_admin.form.click_to_select" "Click to Select"}}</a>
+
+          <!-- select one template -->
+          <script name="select-one-selected-template" type="x-tmpl-mustache">
+            <p class="qor-field__selected" data-primary-key="[[ primaryKey ]]">
+              <span class="qor-selected__change">[[ &displayName ]]</span>
+              <a href="#" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>
+            </p>
+          </script>
+
+          <script name="select-one-selected-icon" type="x-tmpl-mustache">
+            <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
+          </script>
+          <!--end: select one template -->
+
         </div>
+
       </div>
-    </div>
   </div>
 
 </div>

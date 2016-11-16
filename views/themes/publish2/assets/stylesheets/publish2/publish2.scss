@@ -1,5 +1,17 @@
 $body_bg_color: #f5f5f5;
 
+tr.is-showing{
+    border-left: 2px solid #03a9f4;
+}
+.qor-pulish2__action{
+    margin-bottom: 0 !important;
+    .qor-field__selectone{
+        padding-bottom: 0;
+    }
+    .qor-field__selectone-trigger{
+        margin-left: 0 !important;
+    }
+}
 .qor-table__inner-list{
     background-color: $body_bg_color;
     &:hover{
