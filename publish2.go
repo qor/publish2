@@ -30,10 +30,6 @@ func enablePublishMode(res resource.Resourcer) {
 			res.UseTheme("publish2")
 
 			if IsVersionableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "PublishReady",
-					Type: "hidden",
-				})
 				res.IndexAttrs(res.IndexAttrs(), "-PublishReady")
 				res.EditAttrs(res.EditAttrs(), "PublishReady")
 				res.NewAttrs(res.NewAttrs(), "PublishReady")
