@@ -12,15 +12,15 @@ func init() {
 	admin.RegisterViewPath("github.com/qor/publish2/views")
 }
 
-func (Version) ConfigureQorResource(res resource.Resourcer) {
+func (Version) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
-func (Schedule) ConfigureQorResource(res resource.Resourcer) {
+func (Schedule) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
-func (Visible) ConfigureQorResource(res resource.Resourcer) {
+func (Visible) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
@@ -59,6 +59,10 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsVersionableModel(res.Value) {
+				if IsSchedulableModel(res.Value) {
+					res.IndexAttrs(res.IndexAttrs(), "-ScheduledStartAt", "-ScheduledEndAt")
+				}
+
 				res.Meta(&admin.Meta{
 					Name: "VersionPriority",
 					Type: "hidden",
