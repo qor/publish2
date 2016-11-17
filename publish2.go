@@ -12,15 +12,15 @@ func init() {
 	admin.RegisterViewPath("github.com/qor/publish2/views")
 }
 
-func (Version) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
+func (Version) ConfigureQorResource(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
-func (Schedule) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
+func (Schedule) ConfigureQorResource(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
-func (Visible) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
+func (Visible) ConfigureQorResource(res resource.Resourcer) {
 	enablePublishMode(res)
 }
 
