@@ -32,6 +32,7 @@
   var CLASS_SCHEDULED_ENDAT = '[name="QorResource.ScheduledEndAt"]';
 
   var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
+  var CLASS_MEDIALIBRARY_TR = '.qor-table--medialibrary>tbody>tr';
 
   var IS_MEDIALIBRARY = 'qor-table--medialibrary';
   var IS_SHOW_VERSION = 'is-showing';
@@ -91,21 +92,28 @@
           url = $target.data().versionUrl,
           $table = $target.closest('table'),
           $tr = $target.closest('tr'),
-          hasVersion = $tr.next(CLASS_VERSION_LIST).size(),
           colspan = $tr.find('td').size(),
           isMediaLibrary = $table.hasClass(IS_MEDIALIBRARY),
-          newRow = '<tr class="' + VERSION_LIST + '"><td colspan="' + colspan + '"></td></tr>',
-          $version = $('<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>'),
-          $list;
+          $list,
+          $newRow = $('<tr class="' + VERSION_LIST + '"><td colspan="' + colspan + '"></td></tr>'),
+          $version = $('<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>');
 
       $(CLASS_VERSION_LIST).remove();
       $table.find('tr').removeClass(IS_SHOW_VERSION);
 
-      if (hasVersion) {
-        return false;
+      $tr.addClass(IS_SHOW_VERSION);
+
+      if (isMediaLibrary) {
+        var $trs = $(CLASS_MEDIALIBRARY_TR),
+            columnNum = parseInt($table.width() / 217),
+            currentNum = $trs.index($tr) + 1,
+            currentRow = (currentNum % columnNum) ? parseInt(currentNum / columnNum) + 1 : parseInt(currentNum / columnNum);
+
+        $tr = $($trs.get(( columnNum * currentRow ) - 1));
+        $newRow = $('<tr class="' + VERSION_LIST + '" style="width: ' + (217 * columnNum - 16) + 'px"><td></td></tr>');
       }
 
-      $tr.addClass(IS_SHOW_VERSION).after(newRow);
+      $tr.after($newRow);
       $list = $(CLASS_VERSION_LIST).find('td');
 
       $version.appendTo($list).trigger('enable');
