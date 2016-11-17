@@ -93,6 +93,10 @@
         <div class="qor-field__block qor-field__edit qor-field__selectone" data-toggle="qor.selectone">
           <a href="javascript://" class="mdl-button mdl-button--colored qor-field__selectone-trigger" data-select-modal="one" data-selectone-url="/admin/events">{{t "qor_admin.form.click_to_select" "Click to Select"}}</a>
 
+          <select class="qor-field__input qor-field__selectone-input hidden">
+            <option value="{{.Result.ScheduleEventID}}" selected>{{.Result.ScheduleEventID}}</option>
+          </select>
+
           <!-- select one template -->
           <script name="select-one-selected-template" type="x-tmpl-mustache">
             <p class="qor-field__selected" data-primary-key="[[ primaryKey ]]">
@@ -105,7 +109,6 @@
             <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
           </script>
           <!--end: select one template -->
-
         </div>
       </div>
   </div>
