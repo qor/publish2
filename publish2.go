@@ -29,20 +29,63 @@ func enablePublishMode(res resource.Resourcer) {
 		if res.GetTheme("publish2") == nil {
 			res.UseTheme("publish2")
 
-			res.Meta(&admin.Meta{
-				Name:  "Versions",
-				Label: "Versions",
-				Type:  "publish_versions",
-				Valuer: func(interface{}, *qor.Context) interface{} {
-					return ""
-				},
-			})
+			if IsVersionableModel(res.Value) {
+				res.Meta(&admin.Meta{
+					Name: "PublishReady",
+					Type: "hidden",
+				})
+				res.IndexAttrs(res.IndexAttrs(), "-PublishReady")
+				res.EditAttrs(res.EditAttrs(), "PublishReady")
+				res.NewAttrs(res.NewAttrs(), "PublishReady")
+			}
 
-			router := res.GetAdmin().GetRouter()
-			ctr := controller{Resource: res}
-			router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
+			if IsSchedulableModel(res.Value) {
+				res.Meta(&admin.Meta{
+					Name: "ScheduleEventID",
+					Type: "hidden",
+				})
+				res.Meta(&admin.Meta{
+					Name: "ScheduledStartAt",
+					Type: "hidden",
+				})
+				res.Meta(&admin.Meta{
+					Name: "ScheduledEndAt",
+					Type: "hidden",
+				})
 
-			res.IndexAttrs(res.IndexAttrs(), "Versions")
+				res.IndexAttrs(res.IndexAttrs(), "-ScheduleEventID")
+				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
+				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
+			}
+
+			if IsVersionableModel(res.Value) {
+				res.Meta(&admin.Meta{
+					Name: "VersionPriority",
+					Type: "hidden",
+				})
+
+				res.Meta(&admin.Meta{
+					Name: "VersionName",
+					Type: "hidden",
+				})
+
+				res.Meta(&admin.Meta{
+					Name:  "Versions",
+					Label: "Versions",
+					Type:  "publish_versions",
+					Valuer: func(interface{}, *qor.Context) interface{} {
+						return ""
+					},
+				})
+
+				router := res.GetAdmin().GetRouter()
+				ctr := controller{Resource: res}
+				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
+
+				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionName", "-VersionPriority")
+				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
+				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
+			}
 		}
 	}
 }

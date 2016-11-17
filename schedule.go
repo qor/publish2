@@ -9,6 +9,7 @@ import (
 type Schedule struct {
 	ScheduledStartAt *time.Time `gorm:"index"`
 	ScheduledEndAt   *time.Time `gorm:"index"`
+	ScheduleEventID  *uint
 }
 
 func (schedule *Schedule) GetScheduledStartAt() *time.Time {
@@ -39,4 +40,8 @@ type ScheduleEvent struct {
 	Name            string
 	ScheduleStartAt *time.Time
 	ScheduleEndAt   *time.Time
+}
+
+func (ScheduleEvent) AfterUpdate(tx *gorm.DB) {
+	// sync time changes
 }
