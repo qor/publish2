@@ -18,6 +18,8 @@
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_CHANGE = 'change.' + NAMESPACE;
+  var EVENT_SELECTONE_SELECTED = 'qor.selectone.selected';
+
   var CLASS_VERSION_LINK = '.qor-publish2__version';
 
   var VERSION_LIST = 'qor-table__inner-list';
@@ -25,11 +27,14 @@
   var CLASS_VERSION_LIST = '.' + VERSION_LIST;
   var CLASS_VERSION_BLOCK = '.' + VERSION_BLOCK;
 
-  var CLASS_TABLE = '.qor-table';
+  var CLASS_EVENT_ID = '.qor-pulish2__eventid';
+  var CLASS_EVENT_INPUT = '.qor-pulish2__eventid-input';
 
   var CLASS_PUBLISH_READY = '[name="QorResource.PublishReady"]';
   var CLASS_SCHEDULED_STARTAT = '[name="QorResource.ScheduledStartAt"]';
   var CLASS_SCHEDULED_ENDAT = '[name="QorResource.ScheduledEndAt"]';
+  var CLASS_PUBLISH_VERSIONNAME = '[name="QorResource.VersionName"]';
+  var CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduleEventID"]';
 
   var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
   var CLASS_MEDIALIBRARY_TR = '.qor-table--medialibrary>tbody>tr';
@@ -50,7 +55,9 @@
       this.actionType = {
         'scheduledstart' : CLASS_SCHEDULED_STARTAT,
         'scheduledend' : CLASS_SCHEDULED_ENDAT,
-        'publishready': CLASS_PUBLISH_READY
+        'publishready': CLASS_PUBLISH_READY,
+        'versionname': CLASS_PUBLISH_VERSIONNAME,
+        'eventid': CLASS_PUBLISH_EVENTID
       };
       this.bind();
     },
@@ -58,7 +65,9 @@
     bind: function () {
       $document
         .on(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
-        .on(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this));
+        .on(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
+        .on(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this));
+
     },
 
     unbind: function () {
@@ -87,6 +96,10 @@
 
     },
 
+    eventidChanged: function (e, data) {
+      $(CLASS_EVENT_INPUT).val(data.primaryKey).trigger('change');
+    },
+
     loadPublishVersion: function (e) {
       var $target = $(e.target),
           url = $target.data().versionUrl,
@@ -110,6 +123,9 @@
             currentRow = Math.ceil(currentNum / columnNum);
 
         $tr = $($trs.get(( columnNum * currentRow ) - 1));
+        if (!$tr.size()) {
+          $tr = $trs.last();
+        }
         $newRow = $('<tr class="' + VERSION_LIST + '" style="width: ' + (217 * columnNum - 16) + 'px"><td></td></tr>');
       }
 

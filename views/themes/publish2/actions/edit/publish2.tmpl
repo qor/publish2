@@ -90,7 +90,17 @@
 
         <div class="qor-field__show"></div>
 
-        <div class="qor-field__block qor-field__edit qor-field__selectone" data-toggle="qor.selectone">
+        <div class="qor-field__block qor-field__edit qor-field__selectone qor-pulish2__eventid" data-toggle="qor.selectone">
+
+          <input class="qor-pulish2__action-input qor-pulish2__eventid-input" type="hidden" data-action-type="eventid" />
+
+          {{ if .Result.ScheduleEventID}}
+            <p class="qor-field__selected" data-primary-key="{{.Result.ScheduleEventID}}">
+              <span class="qor-selected__change">{{.Result.ScheduleEventID}}</span>
+              <a href="#" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>
+            </p>
+          {{ end}}
+
           <a href="javascript://" class="mdl-button mdl-button--colored qor-field__selectone-trigger" data-select-modal="one" data-selectone-url="/admin/events">{{t "qor_admin.form.click_to_select" "Click to Select"}}</a>
 
           <select class="qor-field__input qor-field__selectone-input hidden">
