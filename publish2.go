@@ -44,14 +44,6 @@ func enablePublishMode(res resource.Resourcer) {
 					Name: "ScheduleEventID",
 					Type: "hidden",
 				})
-				res.Meta(&admin.Meta{
-					Name: "ScheduledStartAt",
-					Type: "hidden",
-				})
-				res.Meta(&admin.Meta{
-					Name: "ScheduledEndAt",
-					Type: "hidden",
-				})
 
 				res.IndexAttrs(res.IndexAttrs(), "-ScheduleEventID")
 				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
