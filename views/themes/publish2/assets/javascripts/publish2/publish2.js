@@ -107,7 +107,7 @@
         var $trs = $(CLASS_MEDIALIBRARY_TR),
             columnNum = parseInt($table.width() / 217),
             currentNum = $trs.index($tr) + 1,
-            currentRow = (currentNum % columnNum) ? parseInt(currentNum / columnNum) + 1 : parseInt(currentNum / columnNum);
+            currentRow = Math.ceil(currentNum / columnNum);
 
         $tr = $($trs.get(( columnNum * currentRow ) - 1));
         $newRow = $('<tr class="' + VERSION_LIST + '" style="width: ' + (217 * columnNum - 16) + 'px"><td></td></tr>');
