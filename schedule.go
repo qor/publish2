@@ -28,11 +28,16 @@ func (schedule *Schedule) SetScheduledEndAt(t *time.Time) {
 	schedule.ScheduledEndAt = t
 }
 
+func (schedule *Schedule) GetScheduleEventID() *uint {
+	return schedule.ScheduleEventID
+}
+
 type ScheduledInterface interface {
 	GetScheduledStartAt() *time.Time
 	SetScheduledStartAt(*time.Time)
 	GetScheduledEndAt() *time.Time
 	SetScheduledEndAt(*time.Time)
+	GetScheduleEventID() *uint
 }
 
 type ScheduleEvent struct {

@@ -78,6 +78,17 @@ func enablePublishMode(res resource.Resourcer) {
 				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
 				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
 			}
+
+			res.GetAdmin().RegisterFuncMap("get_schedule_event", func(record interface{}, context *admin.Context) interface{} {
+				if scheduledInterface, ok := record.(ScheduledInterface); ok {
+					var scheduleEvent ScheduleEvent
+					if scheduledInterface.GetScheduleEventID() != nil {
+						context.GetDB().First(&scheduleEvent, "id = ?", scheduledInterface.GetScheduleEventID())
+						return scheduleEvent
+					}
+				}
+				return nil
+			})
 		}
 	}
 }
