@@ -1,4 +1,6 @@
+{{$resource := .Resource}}
 {{$version_metas := version_metas}}
+
 <table class="mdl-data-table mdl-js-data-table qor-table__version">
   <thead>
     {{range $meta := $version_metas}}
@@ -8,7 +10,8 @@
   </thead>
   <tbody>
     {{range $result := .Result}}
-      <tr>
+      {{$primaryKey := primary_key_of $result}}
+      <tr data-primary-key="{{$primaryKey}}" data-url="{{url_for $result $resource}}?version_name={{$result.GetVersionName}}">
         {{range $meta := $version_metas}}
           <td class="mdl-data-table__cell--non-numeric">{{render_meta $result $meta}}</td>
         {{end}}
