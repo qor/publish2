@@ -30,6 +30,9 @@ tr.is-showing{
 }
 .qor-pulish2__action{
     margin-bottom: 0 !important;
+    .qor-pulish2__action-input:disabled{
+        color: #999;
+    }
     .qor-field__selectone{
         padding-bottom: 0;
     }

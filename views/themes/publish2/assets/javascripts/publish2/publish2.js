@@ -18,7 +18,7 @@
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_CHANGE = 'change.' + NAMESPACE;
-  var EVENT_SELECTONE_SELECTED = 'qor.selectone.selected';
+  var EVENT_SELECTONE_SELECTED = 'qor.selectone.selected qor.selectone.unselected';
 
   var CLASS_VERSION_LINK = '.qor-publish2__version';
 
@@ -36,7 +36,11 @@
   var CLASS_PUBLISH_VERSIONNAME = '[name="QorResource.VersionName"]';
   var CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduleEventID"]';
 
+  var CLASS_PUBLISH_ACTION = '.qor-pulish2__action';
+  var CLASS_PUBLISH_ACTION_START = '.qor-pulish2__action-start';
+  var CLASS_PUBLISH_ACTION_END = '.qor-pulish2__action-end';
   var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
+  var CLASS_PICKER_BUTTON = '.qor-action__picker-button';
   var CLASS_MEDIALIBRARY_TR = '.qor-table--medialibrary>tbody>tr';
 
   var IS_MEDIALIBRARY = 'qor-table--medialibrary';
@@ -52,13 +56,7 @@
     constructor: QorPublish2,
 
     init: function () {
-      this.actionType = {
-        'scheduledstart' : CLASS_SCHEDULED_STARTAT,
-        'scheduledend' : CLASS_SCHEDULED_ENDAT,
-        'publishready': CLASS_PUBLISH_READY,
-        'versionname': CLASS_PUBLISH_VERSIONNAME,
-        'eventid': CLASS_PUBLISH_EVENTID
-      };
+      this.actionType = this.options.element;
       this.bind();
     },
 
@@ -96,8 +94,42 @@
 
     },
 
+    eventidRemoved: function () {
+
+    },
+
     eventidChanged: function (e, data) {
-      $(CLASS_EVENT_INPUT).val(data.primaryKey).trigger('change');
+      if (data) {
+        $(CLASS_EVENT_INPUT).val(data.primaryKey);
+      } else {
+        $(CLASS_EVENT_INPUT).val('');
+      }
+
+      this.updateDate(data, e.target);
+      $(CLASS_EVENT_INPUT).trigger('change');
+    },
+
+    updateDate: function (data, element) {
+      var $parent = $(element).closest(CLASS_PUBLISH_ACTION),
+          $start = $parent.find(CLASS_PUBLISH_ACTION_START),
+          $end = $parent.find(CLASS_PUBLISH_ACTION_END),
+          $button = $parent.find(CLASS_PICKER_BUTTON),
+          $input = $button.parent().find('input');
+
+      if (data) {
+        $start.val(data.ScheduleStartAt);
+        $end.val(data.ScheduleEndAt);
+        $button.hide();
+        $input.attr('disabled', true);
+      } else {
+        $start.val('');
+        $end.val('');
+        $button.show();
+        $input.attr('disabled', false).closest('.is-disabled').removeClass('is-disabled');
+      }
+
+      $start.trigger('change');
+      $end.trigger('change');
     },
 
     loadPublishVersion: function (e) {
@@ -149,20 +181,30 @@
   };
 
   $.fn.qorSliderAfterShow.initPublishForm = function () {
+    var $action = $(CLASS_PUBLISH_ACTION),
+        $types = $action.find('[data-action-type]'),
+        element = QorPublish2.ELEMENT;
 
-    if (!$('.qor-pulish2__action').size()) {
+    if (!$action.size() || !$types.size()) {
       return;
     }
 
-    var classNames = [CLASS_SCHEDULED_STARTAT, CLASS_SCHEDULED_ENDAT, CLASS_PUBLISH_READY];
-
-    for (var i = 0; i < classNames.length; i++) {
-      $(classNames[i]).closest('.qor-form-section').hide();
-    }
+    $types.each(function () {
+      var $this = $(this);
+      $(element[$this.data().actionType]).closest('.qor-form-section').hide();
+    });
 
   };
 
   QorPublish2.DEFAULTS = {};
+
+  QorPublish2.ELEMENT = {
+    'scheduledstart' : CLASS_SCHEDULED_STARTAT,
+    'scheduledend' : CLASS_SCHEDULED_ENDAT,
+    'publishready': CLASS_PUBLISH_READY,
+    'versionname': CLASS_PUBLISH_VERSIONNAME,
+    'eventid': CLASS_PUBLISH_EVENTID
+  };
 
   QorPublish2.plugin = function (options) {
     return this.each(function () {
@@ -189,12 +231,16 @@
   $(function () {
     var selector = '.qor-theme-publish2';
 
+    var options = {};
+
+    options['element'] = QorPublish2.ELEMENT;
+
     $(document).
       on(EVENT_DISABLE, function (e) {
         QorPublish2.plugin.call($(selector, e.target), 'destroy');
       }).
       on(EVENT_ENABLE, function (e) {
-        QorPublish2.plugin.call($(selector, e.target));
+        QorPublish2.plugin.call($(selector, e.target), options);
       }).
       triggerHandler(EVENT_ENABLE);
   });
