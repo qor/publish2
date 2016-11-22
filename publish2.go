@@ -29,7 +29,7 @@ func enablePublishMode(res resource.Resourcer) {
 		if res.GetTheme("publish2") == nil {
 			res.UseTheme("publish2")
 
-			if IsVersionableModel(res.Value) {
+			if IsPublishReadyableModel(res.Value) {
 				res.IndexAttrs(res.IndexAttrs(), "-PublishReady")
 				res.EditAttrs(res.EditAttrs(), "PublishReady")
 				res.NewAttrs(res.NewAttrs(), "PublishReady")
