@@ -61,6 +61,72 @@
           </div>
         </div>
       </div>
+    {{end}}
+
+    {{$scheduledEndAtMeta := $resource.GetMeta "ScheduledEndAt"}}
+    {{if $scheduledEndAtMeta}}
+      <div class="qor-field">
+        <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
+          <label class="qor-field__label mdl-textfield__label" for="">
+            {{meta_label $scheduledEndAtMeta}}
+          </label>
+
+          <div class="qor-field__edit qor-field__datetimepicker">
+            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}">
+            <div>
+              <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+                <i class="material-icons">date_range</i>
+              </button>
+
+              <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+                <i class="material-icons">access_time</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   {{end}}
+
+  {{$scheduleEventIDMeta := $resource.GetMeta "ScheduleEventID"}}
+  {{if $scheduleEventIDMeta}}
+    <div class="qor-form-section-rows qor-section-columns-2 clearfix">
+      <div class="qor-field">
+        <label class="qor-field__label">
+          {{meta_label $scheduleEventIDMeta}}
+        </label>
+
+        <div class="qor-field__block qor-field__edit qor-field__selectone qor-pulish2__eventid" data-toggle="qor.selectone">
+          <input class="qor-pulish2__action-input qor-pulish2__eventid-input" type="hidden" data-action-type="eventid" />
+          {{$scheduleEvent := (get_schedule_event $result .)}}
+          {{if $scheduleEvent}}
+            <p class="qor-field__selected" data-primary-key="{{$scheduleEvent.ID}}">
+              <span class="qor-selected__change">{{$scheduleEvent.Name}}</span>
+              <a href="#" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>
+            </p>
+          {{ end}}
+
+          <a href="javascript://" class="mdl-button mdl-button--colored qor-field__selectone-trigger" data-select-modal="one" data-selectone-url="/admin/events">{{t "qor_admin.form.click_to_select" "Click to Select"}}</a>
+
+          <select class="qor-field__input qor-field__selectone-input hidden">
+            {{if $scheduleEvent}}
+              <option value="{{$scheduleEvent.ID}}" selected>{{$scheduleEvent.Name}}</option>
+            {{end}}
+          </select>
+
+          <!-- select one template -->
+          <script name="select-one-selected-template" type="x-tmpl-mustache">
+            <p class="qor-field__selected" data-primary-key="[[ primaryKey ]]">
+              <span class="qor-selected__change">[[ &displayName ]]</span>
+              <a href="#" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>
+            </p>
+          </script>
+
+          <script name="select-one-selected-icon" type="x-tmpl-mustache">
+            <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
+          </script>
+          <!--end: select one template -->
+        </div>
+      </div>
+    {{end}}
 </div>
