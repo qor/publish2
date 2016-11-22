@@ -1,1 +1,5 @@
-time selector to switch versions
+{{$resource := .Resource}}
+{{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
+{{if $scheduledStartAtMeta}}
+  time selector to switch versions
+{{end}}
