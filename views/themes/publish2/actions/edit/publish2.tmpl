@@ -61,27 +61,27 @@
           </div>
         </div>
       </div>
-    {{end}}
+    </div>
+  {{end}}
 
-    {{$scheduledEndAtMeta := $resource.GetMeta "ScheduledEndAt"}}
-    {{if $scheduledEndAtMeta}}
-      <div class="qor-field">
-        <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-          <label class="qor-field__label mdl-textfield__label" for="">
-            {{meta_label $scheduledEndAtMeta}}
-          </label>
+  {{$scheduledEndAtMeta := $resource.GetMeta "ScheduledEndAt"}}
+  {{if $scheduledEndAtMeta}}
+    <div class="qor-field">
+      <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
+        <label class="qor-field__label mdl-textfield__label" for="">
+          {{meta_label $scheduledEndAtMeta}}
+        </label>
 
-          <div class="qor-field__edit qor-field__datetimepicker">
-            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}">
-            <div>
-              <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
-                <i class="material-icons">date_range</i>
-              </button>
+        <div class="qor-field__edit qor-field__datetimepicker">
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}">
+          <div>
+            <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+              <i class="material-icons">date_range</i>
+            </button>
 
-              <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
-                <i class="material-icons">access_time</i>
-              </button>
-            </div>
+            <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+              <i class="material-icons">access_time</i>
+            </button>
           </div>
         </div>
       </div>
@@ -128,5 +128,6 @@
           <!--end: select one template -->
         </div>
       </div>
-    {{end}}
+    </div>
+  {{end}}
 </div>
