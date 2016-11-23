@@ -91,6 +91,16 @@ func enablePublishMode(res resource.Resourcer) {
 					},
 				})
 
+				res.Scope(&admin.Scope{
+					Default: true,
+					Handle: func(tx *gorm.DB, context *qor.Context) *gorm.DB {
+						if versionName := context.Request.URL.Query().Get("version_name"); versionName != "" {
+							tx = tx.Set(VersionNameMode, versionName)
+						}
+						return tx
+					},
+				})
+
 				router := res.GetAdmin().GetRouter()
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})

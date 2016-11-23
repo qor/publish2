@@ -13,6 +13,7 @@ import (
 const (
 	ModeOff             = "off"
 	VersionMode         = "publish:version:mode"
+	VersionNameMode     = "publish:version:name"
 	VersionMultipleMode = "multiple"
 
 	ScheduleMode    = "publish:schedule:mode"
@@ -124,23 +125,27 @@ func queryCallback(scope *gorm.Scope) {
 		case VersionMultipleMode:
 			scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 		default:
-			var sql string
-			var primaryKeys []string
-
-			for _, primaryField := range scope.PrimaryFields() {
-				if primaryField.DBName != "version_name" {
-					primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
-				}
-			}
-
-			primaryKeyCondition := strings.Join(primaryKeys, ",")
-			if len(conditions) == 0 {
-				sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition)
+			if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+				scope.Search.Where("version_name = ?", versionName)
 			} else {
-				sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
-			}
+				var sql string
+				var primaryKeys []string
 
-			scope.Search.Where(sql, conditionValues...)
+				for _, primaryField := range scope.PrimaryFields() {
+					if primaryField.DBName != "version_name" {
+						primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
+					}
+				}
+
+				primaryKeyCondition := strings.Join(primaryKeys, ",")
+				if len(conditions) == 0 {
+					sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition)
+				} else {
+					sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
+				}
+
+				scope.Search.Where(sql, conditionValues...)
+			}
 		}
 
 		scope.Search.Order("version_priority DESC")
