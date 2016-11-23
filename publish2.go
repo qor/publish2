@@ -105,7 +105,7 @@ func enablePublishMode(res resource.Resourcer) {
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
 
-				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionName", "-VersionPriority")
+				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionPriority")
 				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
 				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
 			}
@@ -138,6 +138,9 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
 		res.Meta(&admin.Meta{
 			Name: "ScheduledStartAt",
+			Valuer: func(interface{}, *qor.Context) interface{} {
+				return ""
+			},
 		})
 
 		res.UseTheme("publish2")
