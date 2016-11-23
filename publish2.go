@@ -134,12 +134,12 @@ func enablePublishMode(res resource.Resourcer) {
 type Publish struct {
 }
 
-func (Publish) IsPublishDashboard() bool {
-	return true
-}
-
 func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
+		res.Meta(&admin.Meta{
+			Name: "ScheduledStartAt",
+		})
+
 		res.UseTheme("publish2")
 
 		if res.Config.Name == "" {

@@ -1,7 +1,7 @@
 {{$resource := .Resource}}
 {{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
 
-{{if (or $scheduledStartAtMeta $resource.Value.IsPublishDashboard)}}
+{{if $scheduledStartAtMeta}}
   <div class="qor-actions qor-actions__filter-time " data-toggle="qor.filter.time">
     <div class="qor-selector left-aligned">
       <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
