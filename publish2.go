@@ -120,6 +120,13 @@ func enablePublishMode(res resource.Resourcer) {
 				}
 				return nil
 			})
+
+			res.GetAdmin().RegisterFuncMap("get_schedule_events", func(context *admin.Context) interface{} {
+				res := context.Admin.GetResource("ScheduleEvent")
+				scheduleEvents := res.NewSlice()
+				context.GetDB().Find(scheduleEvents)
+				return map[string]interface{}{"Resource": res, "Events": scheduleEvents}
+			})
 		}
 	}
 }

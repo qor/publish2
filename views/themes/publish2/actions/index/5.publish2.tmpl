@@ -45,6 +45,15 @@
       </div>
 
       <button type="button" class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button qor-filter__button-search">Done</button>
+
+      <ul>
+        {{$eventResults := (get_schedule_events .)}}
+        {{$scheduleStartAtMeta := $eventResults.Resource.GetMeta "ScheduleStartAt"}}
+        {{$scheduleEndAtMeta := $eventResults.Resource.GetMeta "ScheduleEndAt"}}
+        {{range $event := $eventResults.Events}}
+          <li data-schedule-start-at="{{render_meta $event $scheduleStartAtMeta}}" data-schedule-end-at="{{render_meta $event $scheduleEndAtMeta}}">{{$event.Name}}</li>
+        {{end}}
+      </ul>
     </div>
   </div>
 {{end}}
