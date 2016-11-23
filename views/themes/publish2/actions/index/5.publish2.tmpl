@@ -1,0 +1,50 @@
+{{$resource := .Resource}}
+{{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
+
+{{if (or $scheduledStartAtMeta $resource.Value.IsPublishDashboard)}}
+  <div class="qor-actions qor-actions__filter-time " data-toggle="qor.filter.time">
+    <div class="qor-selector left-aligned">
+      <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
+        <span class="qor-selector-label">Start At</span>
+        <i class="material-icons qor-selector-arrow">arrow_drop_down</i>
+      </a>
+    </div>
+
+    <div class="qor-filter__block clearfix" style="display: none;">
+
+      <div class="qor-filter__block-buttons">
+        <button type="button" class="mdl-button mdl-js-button" data-filter-range="today">Today</button>
+        <button type="button" class="mdl-button mdl-js-button" data-filter-range="week">This week</button>
+        <button type="button" class="mdl-button mdl-js-button" data-filter-range="month">This month</button>
+      </div>
+
+      <div class="qor-field__edit qor-field__datetimepicker">
+        <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__start" data-search-param="schedule_start_at" placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="" />
+        <div>
+          <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+            <i class="material-icons">date_range</i>
+          </button>
+
+          <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+            <i class="material-icons">access_time</i>
+          </button>
+        </div>
+      </div>
+
+      <div class="qor-field__edit qor-field__datetimepicker">
+        <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__end" data-search-param="schedule_end_at" placeholder="YYYY-MM-DD HH:MM" type="text" id="" name="" value="" />
+        <div>
+          <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+            <i class="material-icons">date_range</i>
+          </button>
+
+          <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+            <i class="material-icons">access_time</i>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button qor-filter__button-search">Done</button>
+    </div>
+  </div>
+{{end}}

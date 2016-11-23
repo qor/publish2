@@ -127,8 +127,14 @@ func enablePublishMode(res resource.Resourcer) {
 type Publish struct {
 }
 
+func (Publish) IsPublishDashboard() bool {
+	return true
+}
+
 func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 	if res, ok := res.(*admin.Resource); ok {
+		res.UseTheme("publish2")
+
 		if res.Config.Name == "" {
 			res.Name = "Schedule"
 		}
@@ -143,6 +149,6 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 		Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
 
 		ctr := controller{Resource: res}
-		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard)
+		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
 	}
 }

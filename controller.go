@@ -12,6 +12,7 @@ type controller struct {
 }
 
 func (ctr controller) Dashboard(context *admin.Context) {
+	context.Action = "index"
 	context.Execute("publish2/dashboard", ctr.Resource)
 }
 

@@ -1,1 +1,10 @@
-publish dashboard page
+{{$actions := load_actions "index" }}
+{{if $actions}}
+  <div class="qor-page__header">
+    {{$actions}}
+  </div>
+{{end}}
+
+<div class="qor-page__body">
+  publish dashboard page
+</div>
