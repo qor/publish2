@@ -122,8 +122,6 @@
         $button.hide();
         $input.attr('disabled', true);
       } else {
-        $start.val('');
-        $end.val('');
         $button.show();
         $input.attr('disabled', false).closest('.is-disabled').removeClass('is-disabled');
       }
