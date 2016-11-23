@@ -3,9 +3,11 @@ package publish2
 import (
 	"path"
 
+	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
+	"github.com/qor/qor/utils"
 )
 
 func init() {
@@ -44,6 +46,25 @@ func enablePublishMode(res resource.Resourcer) {
 				res.IndexAttrs(res.IndexAttrs(), "-ScheduleEventID")
 				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
 				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
+
+				res.Scope(&admin.Scope{
+					Default: true,
+					Handle: func(tx *gorm.DB, context *qor.Context) *gorm.DB {
+						if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
+							if t, err := utils.ParseTime(startAt, context); err == nil {
+								tx = tx.Set(ScheduleStart, t)
+							}
+						}
+
+						if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
+							if t, err := utils.ParseTime(endAt, context); err == nil {
+								tx = tx.Set(ScheduleEnd, t)
+							}
+						}
+
+						return tx
+					},
+				})
 			}
 
 			if IsVersionableModel(res.Value) {

@@ -62,54 +62,51 @@ func queryCallback(scope *gorm.Scope) {
 	)
 
 	if isSchedulable {
-		switch mode, _ := scope.DB().Get(ScheduleMode); mode {
-		case ModeOff:
-		default:
-			var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
+		var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
+		var mode, _ = scope.DB().Get(ScheduleMode)
 
-			if v, ok := scope.Get(ScheduleStart); ok {
+		if v, ok := scope.Get(ScheduleStart); ok {
+			if t, ok := v.(*time.Time); ok {
+				scheduledStartTime = t
+			} else if t, ok := v.(time.Time); ok {
+				scheduledStartTime = &t
+			}
+
+			if scheduledStartTime != nil {
+				conditions = append(conditions, "(scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+				conditionValues = append(conditionValues, scheduledStartTime)
+			}
+		}
+
+		if v, ok := scope.Get(ScheduleEnd); ok {
+			if t, ok := v.(*time.Time); ok {
+				scheduledEndTime = t
+			} else if t, ok := v.(time.Time); ok {
+				scheduledEndTime = &t
+			}
+
+			if scheduledEndTime != nil {
+				conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?)")
+				conditionValues = append(conditionValues, scheduledEndTime)
+			}
+		}
+
+		if len(conditions) == 0 && mode != ModeOff {
+			if v, ok := scope.Get(ScheduleCurrent); ok {
 				if t, ok := v.(*time.Time); ok {
-					scheduledStartTime = t
+					scheduledCurrentTime = t
 				} else if t, ok := v.(time.Time); ok {
-					scheduledStartTime = &t
-				}
-
-				if scheduledStartTime != nil {
-					conditions = append(conditions, "(scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-					conditionValues = append(conditionValues, scheduledStartTime)
+					scheduledCurrentTime = &t
 				}
 			}
 
-			if v, ok := scope.Get(ScheduleEnd); ok {
-				if t, ok := v.(*time.Time); ok {
-					scheduledEndTime = t
-				} else if t, ok := v.(time.Time); ok {
-					scheduledEndTime = &t
-				}
-
-				if scheduledEndTime != nil {
-					conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?)")
-					conditionValues = append(conditionValues, scheduledEndTime)
-				}
+			if scheduledCurrentTime == nil {
+				now := time.Now()
+				scheduledCurrentTime = &now
 			}
 
-			if len(conditions) == 0 {
-				if v, ok := scope.Get(ScheduleCurrent); ok {
-					if t, ok := v.(*time.Time); ok {
-						scheduledCurrentTime = t
-					} else if t, ok := v.(time.Time); ok {
-						scheduledCurrentTime = &t
-					}
-				}
-
-				if scheduledCurrentTime == nil {
-					now := time.Now()
-					scheduledCurrentTime = &now
-				}
-
-				conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-				conditionValues = append(conditionValues, scheduledCurrentTime, scheduledCurrentTime)
-			}
+			conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+			conditionValues = append(conditionValues, scheduledCurrentTime, scheduledCurrentTime)
 		}
 	}
 
