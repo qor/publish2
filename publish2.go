@@ -65,6 +65,10 @@ func enablePublishMode(res resource.Resourcer) {
 						return tx
 					},
 				})
+
+				if res.GetAdmin().GetResource(utils.ModelType(&Publish{}).Name()) == nil {
+					res.GetAdmin().AddResource(&Publish{})
+				}
 			}
 
 			if IsVersionableModel(res.Value) {
@@ -154,9 +158,11 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 		}
 
 		Admin := res.GetAdmin()
-		//TODO make it configable
-		Admin.AddResource(&ScheduleEvent{}, &admin.Config{Name: "Event", Menu: res.Config.Menu, Priority: -1})
-		Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
+
+		if res.GetAdmin().GetResource("ScheduleEvent") == nil {
+			Admin.AddResource(&ScheduleEvent{}, &admin.Config{Menu: res.Config.Menu, Priority: -1})
+			Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
+		}
 
 		ctr := controller{Resource: res}
 		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
