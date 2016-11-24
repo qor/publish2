@@ -1,3 +1,4 @@
+{{$context := .}}
 {{$actions := load_actions "index" }}
 {{if $actions}}
   <div class="qor-page__header">
@@ -6,5 +7,18 @@
 {{end}}
 
 <div class="qor-page__body">
-  publish dashboard page
+  {{range $result := .Result}}
+    <div class="qor-section">
+      <div class="qor-section__header">
+        {{$res := $result.Resource}}
+        {{if $res.Config.Singleton}}
+          <h4 class="qor-section-title">{{t (printf "%v.name" $res.ToParam) $res.Name}}</h4>
+        {{else}}
+          <h4 class="qor-section-title">{{t (printf "%v.name" $res.ToParam) (plural $res.Name)}}</h4>
+        {{end}}
+      </div>
+
+      {{(new_resource_context $res).Render "index/table" $result.Results}}
+    </div>
+  {{end}}
 </div>
