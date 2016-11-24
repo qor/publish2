@@ -137,6 +137,12 @@
           $newRow = $('<tr class="' + VERSION_LIST + '"><td colspan="' + colspan + '"></td></tr>'),
           $version = $('<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>');
 
+      if ($tr.hasClass(IS_SHOW_VERSION)) {
+        $(CLASS_VERSION_LIST).remove();
+        $table.find('tr').removeClass(IS_SHOW_VERSION);
+        return false;
+      }
+
       $(CLASS_VERSION_LIST).remove();
       $table.find('tr').removeClass(IS_SHOW_VERSION);
 
