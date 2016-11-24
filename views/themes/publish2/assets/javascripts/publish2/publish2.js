@@ -65,13 +65,13 @@
         .on(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
         .on(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
         .on(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this));
-
     },
 
     unbind: function () {
       $document
         .off(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
-        .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this));
+        .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
+        .off(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this));
     },
 
     action: function (e) {
@@ -91,10 +91,6 @@
       } else {
         $target.val(currentValue);
       }
-
-    },
-
-    eventidRemoved: function () {
 
     },
 
