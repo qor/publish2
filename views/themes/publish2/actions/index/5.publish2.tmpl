@@ -5,7 +5,7 @@
   <div class="qor-actions qor-actions__filter-time " data-toggle="qor.filter.time">
     <div class="qor-selector left-aligned">
       <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
-        <span class="qor-selector-label">Start At</span>
+        <span class="qor-selector-label">{{t "qor_publish.schedule.schedule_time" "Schedule Time"}}</span>
         <i class="material-icons qor-selector-arrow">arrow_drop_down</i>
       </a>
     </div>
@@ -14,9 +14,9 @@
 
       <div class="qor-filter__block-buttons">
         <div class="qor-filter__block-normal">
-          <button type="button" class="mdl-button mdl-js-button" data-filter-range="today">Today</button>
-          <button type="button" class="mdl-button mdl-js-button" data-filter-range="week">This week</button>
-          <button type="button" class="mdl-button mdl-js-button" data-filter-range="month">This month</button>
+          <button type="button" class="mdl-button mdl-js-button" data-filter-range="today">{{t "qor_publish.schedule.today" "Today"}}</button>
+          <button type="button" class="mdl-button mdl-js-button" data-filter-range="week">{{t "qor_publish.schedule.this_week" "This Week"}}</button>
+          <button type="button" class="mdl-button mdl-js-button" data-filter-range="month">{{t "qor_publish.schedule.this_month" "This Month"}}</button>
         </div>
 
         {{$eventResults := (get_schedule_events .)}}
@@ -24,7 +24,7 @@
         {{$scheduleEndAtMeta := $eventResults.Resource.GetMeta "ScheduleEndAt"}}
         {{if len $eventResults}}
         <div class="qor-filter__block-events">
-          <label class="qor-field__label">Events</label>
+          <label class="qor-field__label">{{t "qor_publish.schedule.events" "Events"}}</label>
           {{range $event := $eventResults.Events}}
             <button type="button" class="mdl-button mdl-js-button" data-filter-range="events" data-schedule-start-at="{{render_meta $event $scheduleStartAtMeta}}" data-schedule-end-at="{{render_meta $event $scheduleEndAtMeta}}">{{$event.Name}}</button>
           {{end}}
@@ -32,7 +32,7 @@
         {{end}}
       </div>
 
-      <label class="qor-field__label">Custom</label>
+      <label class="qor-field__label">{{t "qor_publish.schedule.custom" "Custom"}}</label>
       <div class="qor-field__edit qor-field__datetimepicker">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label"></label>
@@ -65,9 +65,7 @@
         </div>
       </div>
 
-      <button type="button" class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button qor-filter__button-search">Done</button>
-
-
+      <button type="button" class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button qor-filter__button-search">{{t "qor_admin.form.done" "Done"}}</button>
     </div>
   </div>
 {{end}}
