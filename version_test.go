@@ -225,7 +225,7 @@ func TestVersionsWithPublishReady(t *testing.T) {
 	}
 
 	DB.Model(&Article{}).Where("id = ?", articleV2.ID).First(&article2)
-	if article2.VersionName != "" {
+	if article2.VersionName != publish2.DefaultVersionName {
 		t.Errorf("Should find article w/o version name as no other versions is visible")
 	}
 

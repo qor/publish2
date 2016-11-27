@@ -157,7 +157,9 @@ func queryCallback(scope *gorm.Scope) {
 func createCallback(scope *gorm.Scope) {
 	if IsVersionableModel(scope.Value) {
 		if field, ok := scope.FieldByName("VersionName"); ok {
-			field.IsBlank = false
+			if field.IsBlank {
+				field.Set(DefaultVersionName)
+			}
 		}
 
 		updateVersionPriority(scope)
