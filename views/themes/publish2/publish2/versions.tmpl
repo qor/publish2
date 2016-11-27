@@ -11,7 +11,8 @@
   <tbody>
     {{range $result := .Result}}
       {{$primaryKey := primary_key_of $result}}
-      <tr data-primary-key="{{$primaryKey}}" data-url="{{url_for $result $resource}}?version_name={{$result.GetVersionName}}">
+      {{$recordURL := (printf "%v?version_name=%v" (url_for $result $resource) $result.GetVersionName)}}
+      <tr data-primary-key="{{$primaryKey}}" data-url="{{$recordURL}}">
         {{range $meta := $version_metas}}
           <td class="mdl-data-table__cell--non-numeric">{{render_meta $result $meta}}</td>
         {{end}}
@@ -19,10 +20,11 @@
           <button id="actions-for-{{$result.GetVersionName}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">
             <i class="material-icons">more_vert</i>
           </button>
+
           <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="actions-for-{{$result.GetVersionName}}">
             <li class="mdl-menu__item" qor-icon-name="Delete">
-              <a href="#" target="_blank">
-                Delete
+              <a class="qor-action--button" data-url="{{$recordURL}}" data-ajax-form="true" data-from-menu="true" data-confirm="{{t "qor_admin.form.are_you_sure" "Are You Sure?"}}" data-method="DELETE">
+                {{t (printf "qor_publish.actions.%v" $resource.ToParam "delete") "Delete"}}
               </a>
             </li>
           </ul>

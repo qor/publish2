@@ -51,6 +51,8 @@ func RegisterCallbacks(db *gorm.DB) {
 
 	db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
 	db.Callback().Update().Before("gorm:begin_transaction").Register("publish:versions", updateCallback)
+
+	db.Callback().Delete().Before("gorm:begin_transaction").Register("publish:versions", deleteCallback)
 }
 
 func queryCallback(scope *gorm.Scope) {
@@ -131,6 +133,10 @@ func queryCallback(scope *gorm.Scope) {
 				var sql string
 				var primaryKeys []string
 
+				if scope.HasColumn("DeletedAt") {
+					conditions = append(conditions, "deleted_at IS NULL")
+				}
+
 				for _, primaryField := range scope.PrimaryFields() {
 					if primaryField.DBName != "version_name" {
 						primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
@@ -169,6 +175,14 @@ func createCallback(scope *gorm.Scope) {
 func updateCallback(scope *gorm.Scope) {
 	if IsVersionableModel(scope.Value) {
 		updateVersionPriority(scope)
+	}
+}
+
+func deleteCallback(scope *gorm.Scope) {
+	if IsVersionableModel(scope.Value) {
+		if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+			scope.Search.Where("version_name = ?", versionName)
+		}
 	}
 }
 

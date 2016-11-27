@@ -37,6 +37,12 @@ func TestVersions(t *testing.T) {
 	if count != 3 {
 		t.Errorf("Should find all versions for wiki when with multiple mode, but got %v", count)
 	}
+
+	DB.Set(publish2.VersionNameMode, "v2").Delete(&Wiki{}, "id = ?", wiki.ID)
+	DB.Set(publish2.VersionMode, publish2.VersionMultipleMode).Model(&Wiki{}).Where("id = ?", wiki.ID).Count(&count)
+	if count != 2 {
+		t.Errorf("After delete version v2, should only have 2 records left, but got %v", count)
+	}
 }
 
 type Post struct {
