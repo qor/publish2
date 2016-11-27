@@ -105,6 +105,22 @@ func enablePublishMode(res resource.Resourcer) {
 					},
 				})
 
+				res.Action(&admin.Action{
+					Name:   "Create New Version",
+					Method: "GET",
+					URL: func(record interface{}, context *admin.Context) string {
+						if versionable, ok := record.(VersionableInterface); ok {
+							url := context.URLFor(record) + "?new_version=true"
+							if versionName := versionable.GetVersionName(); versionName != "" {
+								url = url + "&version_name=" + versionName
+							}
+							return url
+						}
+						return ""
+					},
+					Modes: []string{"menu_item"},
+				})
+
 				router := res.GetAdmin().GetRouter()
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
