@@ -1,5 +1,6 @@
 {{$resource := .Resource}}
 {{$result := .Result}}
+{{$creating_new_version := .Context.Request.URL.Query.Get "new_version"}}
 
 {{$scheduleEventIDMeta := $resource.GetMeta "ScheduleEventID"}}
 {{$scheduleEvent := (get_schedule_event $result .)}}
@@ -11,11 +12,19 @@
       <div class="qor-field">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
-            {{meta_label $versionMeta}}
+            {{if $creating_new_version}}
+              {{t (printf "%v.attributes.new_version_name" .Resource.ToParam) "New Version Name"}}
+            {{else}}
+              {{meta_label $versionMeta}}
+            {{end}}
           </label>
 
           <div class="qor-field__edit">
-            <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{render_meta $result $versionMeta}}">
+            {{if $creating_new_version}}
+              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="">
+            {{else}}
+              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{render_meta $result $versionMeta}}">
+            {{end}}
           </div>
         </div>
       </div>
@@ -30,9 +39,12 @@
 
           <div class="qor-field__edit">
             <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
-              {{$publishReadyValue := (raw_value_of $result $publishReadyMeta)}}
-
-              <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}}>
+              {{if $creating_new_version}}
+                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready">
+              {{else}}
+                {{$publishReadyValue := (raw_value_of $result $publishReadyMeta)}}
+                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}}>
+              {{end}}
               <span class="mdl-switch__label"></span>
             </label>
           </div>
