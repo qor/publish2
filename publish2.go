@@ -3,7 +3,6 @@ package publish2
 import (
 	"path"
 
-	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -47,25 +46,6 @@ func enablePublishMode(res resource.Resourcer) {
 				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
 				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
 
-				res.Scope(&admin.Scope{
-					Default: true,
-					Handle: func(tx *gorm.DB, context *qor.Context) *gorm.DB {
-						if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
-							if t, err := utils.ParseTime(startAt, context); err == nil {
-								tx = tx.Set(ScheduleStart, t)
-							}
-						}
-
-						if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
-							if t, err := utils.ParseTime(endAt, context); err == nil {
-								tx = tx.Set(ScheduleEnd, t)
-							}
-						}
-
-						return tx
-					},
-				})
-
 				if res.GetAdmin().GetResource(utils.ModelType(&Publish{}).Name()) == nil {
 					res.GetAdmin().AddResource(&Publish{})
 				}
@@ -92,16 +72,6 @@ func enablePublishMode(res resource.Resourcer) {
 					Type:  "publish_versions",
 					Valuer: func(interface{}, *qor.Context) interface{} {
 						return ""
-					},
-				})
-
-				res.Scope(&admin.Scope{
-					Default: true,
-					Handle: func(tx *gorm.DB, context *qor.Context) *gorm.DB {
-						if versionName := context.Request.URL.Query().Get("version_name"); versionName != "" {
-							tx = tx.Set(VersionNameMode, versionName)
-						}
-						return tx
 					},
 				})
 
@@ -179,6 +149,32 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 			Admin.AddResource(&ScheduleEvent{}, &admin.Config{Menu: res.Config.Menu, Priority: -1})
 			Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
 		}
+
+		Admin.GetRouter().Use(&admin.Middleware{
+			Name: "publish2",
+			Handler: func(context *admin.Context, middleware *admin.Middleware) {
+				tx := context.GetDB()
+
+				if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
+					if t, err := utils.ParseTime(startAt, context.Context); err == nil {
+						tx = tx.Set(ScheduleStart, t)
+					}
+				}
+
+				if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
+					if t, err := utils.ParseTime(endAt, context.Context); err == nil {
+						tx = tx.Set(ScheduleEnd, t)
+					}
+				}
+
+				if versionName := context.Request.URL.Query().Get("version_name"); versionName != "" {
+					tx = tx.Set(VersionNameMode, versionName)
+				}
+
+				context.SetDB(tx)
+				middleware.Next(context)
+			},
+		})
 
 		ctr := controller{Resource: res}
 		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
