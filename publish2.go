@@ -52,10 +52,6 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsVersionableModel(res.Value) {
-				if IsSchedulableModel(res.Value) {
-					res.IndexAttrs(res.IndexAttrs(), "-ScheduledStartAt", "-ScheduledEndAt")
-				}
-
 				res.Meta(&admin.Meta{
 					Name: "VersionPriority",
 					Type: "hidden",
