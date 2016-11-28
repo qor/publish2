@@ -27,6 +27,11 @@
                 {{t (printf "qor_publish.actions.%v" $resource.ToParam "delete") "Delete"}}
               </a>
             </li>
+            <li class="mdl-menu__item" qor-icon-name="Create New Version">
+              <a class="qor-action--button" data-url="{{$recordURL}}&new_version=true&qor_open_type=slideout">
+                {{t (printf "%v.actions.%v" $resource.ToParam "Create New Version") "Create New Version"}}
+              </a>
+            </li>
           </ul>
         </td>
       </tr>
