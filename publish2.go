@@ -80,7 +80,7 @@ func enablePublishMode(res resource.Resourcer) {
 					Method: "GET",
 					URL: func(record interface{}, context *admin.Context) string {
 						if versionable, ok := record.(VersionableInterface); ok {
-							url := context.URLFor(record) + "?new_version=true"
+							url := context.URLFor(record) + "?new_version=true&qor_open_type=slideout&"
 							if versionName := versionable.GetVersionName(); versionName != "" {
 								url = url + "&version_name=" + versionName
 							}
