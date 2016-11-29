@@ -19,6 +19,7 @@
     var EVENT_CLICK = 'click.' + NAMESPACE;
     var EVENT_CHANGE = 'change.' + NAMESPACE;
     var EVENT_SELECTONE_SELECTED = 'qor.selectone.selected qor.selectone.unselected';
+    var EVENT_REPLICATOR_ADDED = 'added.qor.replicator';
 
     // sharedable version input name, please change this if adjust name in template !!
     // <input name="QorResource.ColorVariations[0].SizeVariations[0].ShareableVersion" />
@@ -41,6 +42,8 @@
     var CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduleEventID"]';
 
     var CLASS_PUBLISH_ACTION = '.qor-pulish2__action';
+    var CLASS_PUBLISH_ACTION_SHAREDVERSION = '.qor-pulish2__action-sharedversion';
+
     var CLASS_PUBLISH_ACTION_START = '.qor-pulish2__action-start';
     var CLASS_PUBLISH_ACTION_END = '.qor-pulish2__action-end';
     var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
@@ -71,22 +74,28 @@
             $document
                 .on(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
                 .on(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
-                .on(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this));
+                .on(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this))
+                .on(EVENT_REPLICATOR_ADDED, this.replicatorAdded.bind(this));
         },
 
         unbind: function() {
             $document
                 .off(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
                 .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
-                .off(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this));
+                .off(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this))
+                .off(EVENT_REPLICATOR_ADDED, this.replicatorAdded.bind(this));
         },
 
         initActionTemplate: function() {
             if (!$(CLASS_PUBLISH_ACTION).closest('.qor-slideout').size()) {
                 $(CLASS_PUBLISH_ACTION).prependTo($('.mdl-layout__content .qor-page__body')).show();
             }
+            QorPublish2.initSharedVersion();
         },
 
+        replicatorAdded: function(e, $element) {
+            QorPublish2.generateSharedVersionLabel($element);
+        },
 
         action: function(e) {
             var $element = $(e.target),
@@ -194,14 +203,14 @@
 
     };
 
-    $.fn.qorSliderAfterShow.initPublishSharedVersion = function() {
+    QorPublish2.generateSharedVersionLabel = function($element) {
         var sharedVersion = $('[name="shared-version-checkbox"]').html(),
             $inputs = $('input[name$="' + NAME_SHAREABLEVERSION + '"]'),
             data = {},
             randomString;
 
-        if (!$(CLASS_PUBLISH_ACTION).size()) {
-            return;
+        if ($element) {
+            $inputs = $element.find('input[name$="' + NAME_SHAREABLEVERSION + '"]');
         }
 
         $inputs.each(function() {
@@ -209,6 +218,9 @@
                 $field = $input.closest('.qor-fieldset'),
                 $template;
 
+            if ($element) {
+                $field.find(CLASS_PUBLISH_ACTION_SHAREDVERSION).remove();
+            }
             randomString = (Math.random() + 1).toString(36).substring(7);
             data.id = NAME_SHAREABLEVERSION + '_' + randomString;
             $template = $(window.Mustache.render(sharedVersion, data));
@@ -217,10 +229,21 @@
                 $(this).is(':checked') ? $input.val('true') : $input.val('');
             });
 
-            $template.prependTo($field);
+            $template.prependTo($field).trigger('enable');
             $input.closest('.qor-field').hide();
         });
     };
+
+    QorPublish2.initSharedVersion = function() {
+        if (!$(CLASS_PUBLISH_ACTION).size()) {
+            return;
+        }
+
+        QorPublish2.generateSharedVersionLabel();
+
+    };
+
+    $.fn.qorSliderAfterShow.initSharedVersion = QorPublish2.initSharedVersion;
 
     $.fn.qorSliderAfterShow.initPublishForm = function() {
         var $action = $(CLASS_PUBLISH_ACTION),
