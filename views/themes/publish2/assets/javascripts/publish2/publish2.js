@@ -20,6 +20,10 @@
     var EVENT_CHANGE = 'change.' + NAMESPACE;
     var EVENT_SELECTONE_SELECTED = 'qor.selectone.selected qor.selectone.unselected';
 
+    // sharedable version input name, please change this if adjust name in template !!
+    // <input name="QorResource.ColorVariations[0].SizeVariations[0].ShareableVersion" />
+    var NAME_SHAREABLEVERSION = 'ShareableVersion';
+
     var CLASS_VERSION_LINK = '.qor-publish2__version';
 
     var VERSION_LIST = 'qor-table__inner-list';
@@ -45,6 +49,8 @@
 
     var IS_MEDIALIBRARY = 'qor-table--medialibrary';
     var IS_SHOW_VERSION = 'is-showing';
+
+
 
     function QorPublish2(element, options) {
         this.$element = $(element);
@@ -186,6 +192,34 @@
             this.$element.removeData(NAMESPACE);
         }
 
+    };
+
+    $.fn.qorSliderAfterShow.initPublishSharedVersion = function() {
+        var sharedVersion = $('[name="shared-version-checkbox"]').html(),
+            $inputs = $('input[name$="' + NAME_SHAREABLEVERSION + '"]'),
+            data = {},
+            randomString;
+
+        if (!$(CLASS_PUBLISH_ACTION).size()) {
+            return;
+        }
+
+        $inputs.each(function() {
+            var $input = $(this),
+                $field = $input.closest('.qor-fieldset'),
+                $template;
+
+            randomString = (Math.random() + 1).toString(36).substring(7);
+            data.id = NAME_SHAREABLEVERSION + '_' + randomString;
+            $template = $(window.Mustache.render(sharedVersion, data));
+
+            $template.find('input').on(EVENT_CLICK, function() {
+                $(this).is(':checked') ? $input.val('true') : $input.val('');
+            });
+
+            $template.prependTo($field);
+            $input.closest('.qor-field').hide();
+        });
     };
 
     $.fn.qorSliderAfterShow.initPublishForm = function() {

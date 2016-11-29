@@ -6,6 +6,13 @@ tr.is-showing {
     border-left: 2px solid #03a9f4;
 }
 
+.qor-pulish2__action-sharedversion {
+    margin-bottom: 16px;
+    .mdl-switch__label {
+        font-size: 14px;
+    }
+}
+
 .qor-table--medialibrary {
     tr.is-showing {
         border: 0;
