@@ -13,6 +13,10 @@ func init() {
 	admin.RegisterViewPath("github.com/qor/publish2/views")
 }
 
+func (SharedVersion) ConfigureQorResource(res resource.Resourcer) {
+	enablePublishMode(res)
+}
+
 func (Version) ConfigureQorResource(res resource.Resourcer) {
 	enablePublishMode(res)
 }
@@ -95,6 +99,18 @@ func enablePublishMode(res resource.Resourcer) {
 				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionPriority")
 				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
 				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
+			}
+
+			if IsShareableVersionModel(res.Value) {
+				res.Meta(&admin.Meta{
+					Name: "ShareableVersion",
+					Type: "string",
+					Valuer: func(interface{}, *qor.Context) interface{} {
+						return ""
+					},
+					Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+					},
+				})
 			}
 
 			res.GetAdmin().RegisterFuncMap("get_schedule_event", func(record interface{}, context *admin.Context) interface{} {

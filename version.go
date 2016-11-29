@@ -11,11 +11,28 @@ func (version *Version) SetVersionName(name string) {
 	version.VersionName = name
 }
 
-func (version *Version) GetVersionName() string {
+func (version Version) GetVersionName() string {
 	return version.VersionName
 }
 
 type VersionableInterface interface {
 	SetVersionName(string)
 	GetVersionName() string
+}
+
+type SharedVersion struct {
+	VersionName string `gorm:"primary_key"`
+}
+
+func (version *SharedVersion) SetSharedVersionName(name string) {
+	version.VersionName = name
+}
+
+func (version SharedVersion) GetSharedVersionName() string {
+	return version.VersionName
+}
+
+type ShareableVersionInterface interface {
+	SetSharedVersionName(string)
+	GetSharedVersionName() string
 }

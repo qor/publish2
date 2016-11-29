@@ -38,6 +38,13 @@ func IsVersionableModel(model interface{}) (ok bool) {
 	return
 }
 
+func IsShareableVersionModel(model interface{}) (ok bool) {
+	if model != nil {
+		_, ok = reflect.New(utils.ModelType(model)).Interface().(ShareableVersionInterface)
+	}
+	return
+}
+
 func IsPublishReadyableModel(model interface{}) (ok bool) {
 	if model != nil {
 		_, ok = reflect.New(utils.ModelType(model)).Interface().(PublishReadyInterface)
@@ -161,7 +168,7 @@ func queryCallback(scope *gorm.Scope) {
 }
 
 func createCallback(scope *gorm.Scope) {
-	if IsVersionableModel(scope.Value) {
+	if IsVersionableModel(scope.Value) || IsShareableVersionModel(scope.Value) {
 		if field, ok := scope.FieldByName("VersionName"); ok {
 			if field.IsBlank {
 				field.Set(DefaultVersionName)
@@ -179,7 +186,7 @@ func updateCallback(scope *gorm.Scope) {
 }
 
 func deleteCallback(scope *gorm.Scope) {
-	if IsVersionableModel(scope.Value) {
+	if IsVersionableModel(scope.Value) || IsShareableVersionModel(scope.Value) {
 		if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
 			scope.Search.Where("version_name = ?", versionName)
 		}
