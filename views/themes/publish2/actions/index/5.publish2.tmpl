@@ -19,13 +19,14 @@
           <button type="button" class="mdl-button mdl-js-button" data-filter-range="month">{{t "qor_publish.schedule.this_month" "This Month"}}</button>
         </div>
 
-        {{$eventResults := (get_schedule_events .)}}
-        {{$scheduleStartAtMeta := $eventResults.Resource.GetMeta "ScheduledStartAt"}}
-        {{$scheduleEndAtMeta := $eventResults.Resource.GetMeta "ScheduledEndAt"}}
+        {{$eventResource := (get_scheduled_event_resource .)}}
+        {{$eventResults := (get_scheduled_events .)}}
+        {{$scheduleStartAtMeta := $eventResource.GetMeta "ScheduledStartAt"}}
+        {{$scheduleEndAtMeta := $eventResource.GetMeta "ScheduledEndAt"}}
         {{if len $eventResults}}
         <div class="qor-filter__block-events">
           <label class="qor-field__label">{{t "qor_publish.schedule.events" "Events"}}</label>
-          {{range $event := $eventResults.Events}}
+          {{range $event := $eventResults}}
             <button type="button" class="mdl-button mdl-js-button" data-filter-range="events" data-schedule-start-at="{{render_meta $event $scheduleStartAtMeta}}" data-schedule-end-at="{{render_meta $event $scheduleEndAtMeta}}">{{$event.Name}}</button>
           {{end}}
         </div>
