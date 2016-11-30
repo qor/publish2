@@ -146,6 +146,10 @@ func enablePublishMode(res resource.Resourcer) {
 				return nil
 			})
 
+			res.GetAdmin().RegisterFuncMap("get_default_version_name", func() interface{} {
+				return DefaultVersionName
+			})
+
 			res.GetAdmin().RegisterFuncMap("get_schedule_events", func(context *admin.Context) interface{} {
 				res := context.Admin.GetResource("ScheduleEvent")
 				scheduleEvents := res.NewSlice()
