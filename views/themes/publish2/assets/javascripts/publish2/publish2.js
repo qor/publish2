@@ -150,7 +150,7 @@
         },
 
         loadPublishVersion: function(e) {
-            var $target = $(e.target),
+            var $target = $(e.target).parent("a"),
                 url = $target.data().versionUrl,
                 $table = $target.closest('table'),
                 $tr = $target.closest('tr'),

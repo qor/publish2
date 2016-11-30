@@ -1,6 +1,7 @@
 package publish2
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/qor/admin"
@@ -162,6 +163,17 @@ func enablePublishMode(res resource.Resourcer) {
 
 			res.GetAdmin().RegisterFuncMap("get_scheduled_event_resource", func(context *admin.Context) interface{} {
 				return context.Admin.GetResource("ScheduledEvent")
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
+				var (
+					count        int
+					db           = context.GetDB().Set(VersionMode, VersionMultipleMode)
+					scope        = db.NewScope(record)
+					primaryField = scope.PrimaryField()
+				)
+				db.Model(context.Resource.Value).Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).Count(&count)
+				return count
 			})
 		}
 	}
