@@ -103,12 +103,34 @@ func enablePublishMode(res resource.Resourcer) {
 
 			if IsShareableVersionModel(res.Value) {
 				res.Meta(&admin.Meta{
-					Name: "ShareableVersion",
-					Type: "string",
-					Valuer: func(interface{}, *qor.Context) interface{} {
+					Name: "VersionName",
+					Type: "hidden",
+					Valuer: func(record interface{}, context *qor.Context) interface{} {
+						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+							return shareableVersion.GetSharedVersionName()
+						}
 						return ""
 					},
-					Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+					},
+				})
+
+				res.Meta(&admin.Meta{
+					Name: "ShareableVersion",
+					Type: "string",
+					Valuer: func(record interface{}, context *qor.Context) interface{} {
+						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+							return shareableVersion.GetSharedVersionName() != ""
+						}
+						return false
+					},
+					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+						if utils.ToString(metaValue.Value) == "true" {
+							if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+								versionName := context.Request.Form.Get("QorResource.VersionName")
+								shareableVersion.SetSharedVersionName(versionName)
+							}
+						}
 					},
 				})
 			}
