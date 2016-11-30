@@ -66,6 +66,7 @@ func queryCallback(scope *gorm.Scope) {
 	var (
 		isSchedulable      = IsSchedulableModel(scope.Value)
 		isVersionable      = IsVersionableModel(scope.Value)
+		isShareableVersion = IsShareableVersionModel(scope.Value)
 		isPublishReadyable = IsPublishReadyableModel(scope.Value)
 		conditions         []string
 		conditionValues    []interface{}
@@ -163,12 +164,18 @@ func queryCallback(scope *gorm.Scope) {
 
 		scope.Search.Order("version_priority DESC")
 	} else {
+		if isShareableVersion {
+			if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+				scope.Search.Where("version_name = ? OR version_name = ?", versionName, "")
+			}
+		}
+
 		scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
 	}
 }
 
 func createCallback(scope *gorm.Scope) {
-	if IsVersionableModel(scope.Value) || IsShareableVersionModel(scope.Value) {
+	if IsVersionableModel(scope.Value) {
 		if field, ok := scope.FieldByName("VersionName"); ok {
 			if field.IsBlank {
 				field.Set(DefaultVersionName)
@@ -176,6 +183,12 @@ func createCallback(scope *gorm.Scope) {
 		}
 
 		updateVersionPriority(scope)
+	}
+
+	if IsShareableVersionModel(scope.Value) {
+		if field, ok := scope.FieldByName("VersionName"); ok {
+			field.IsBlank = false
+		}
 	}
 }
 
@@ -186,9 +199,13 @@ func updateCallback(scope *gorm.Scope) {
 }
 
 func deleteCallback(scope *gorm.Scope) {
-	if IsVersionableModel(scope.Value) || IsShareableVersionModel(scope.Value) {
-		if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+	if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+		if IsVersionableModel(scope.Value) {
 			scope.Search.Where("version_name = ?", versionName)
+		}
+
+		if IsShareableVersionModel(scope.Value) {
+			scope.Search.Where("version_name = ? OR version_name = ?", versionName, "")
 		}
 	}
 }
