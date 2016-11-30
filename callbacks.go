@@ -166,7 +166,19 @@ func queryCallback(scope *gorm.Scope) {
 	} else {
 		if isShareableVersion {
 			if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
-				scope.Search.Where("version_name = ? OR version_name = ?", versionName, "")
+				var primaryKeys []string
+				for _, primaryField := range scope.PrimaryFields() {
+					if primaryField.DBName != "version_name" {
+						primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
+					}
+				}
+
+				primaryKeyCondition := strings.Join(primaryKeys, ",")
+
+				scope.Search.Where(
+					fmt.Sprintf("version_name = ? OR (version_name = ? AND (%v) NOT IN (SELECT %v FROM %v WHERE version_name = ?))", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName()),
+					versionName, "", versionName,
+				)
 			}
 		}
 
@@ -200,12 +212,8 @@ func updateCallback(scope *gorm.Scope) {
 
 func deleteCallback(scope *gorm.Scope) {
 	if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
-		if IsVersionableModel(scope.Value) {
+		if IsVersionableModel(scope.Value) || IsShareableVersionModel(scope.Value) {
 			scope.Search.Where("version_name = ?", versionName)
-		}
-
-		if IsShareableVersionModel(scope.Value) {
-			scope.Search.Where("version_name = ? OR version_name = ?", versionName, "")
 		}
 	}
 }
