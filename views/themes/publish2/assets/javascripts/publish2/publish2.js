@@ -39,7 +39,7 @@
     var CLASS_SCHEDULED_STARTAT = '[name="QorResource.ScheduledStartAt"]';
     var CLASS_SCHEDULED_ENDAT = '[name="QorResource.ScheduledEndAt"]';
     var CLASS_PUBLISH_VERSIONNAME = '[name="QorResource.VersionName"]';
-    var CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduleEventID"]';
+    var CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduledEventID"]';
 
     var CLASS_PUBLISH_ACTION = '.qor-pulish2__action';
     var CLASS_PUBLISH_ACTION_SHAREDVERSION = '.qor-pulish2__action-sharedversion';
@@ -136,8 +136,8 @@
                 $input = $button.parent().find('input');
 
             if (data) {
-                $start.val(data.ScheduleStartAt);
-                $end.val(data.ScheduleEndAt);
+                $start.val(data.ScheduledStartAt);
+                $end.val(data.ScheduledEndAt);
                 $button.hide();
                 $input.attr('disabled', true);
             } else {

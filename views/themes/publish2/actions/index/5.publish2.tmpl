@@ -20,8 +20,8 @@
         </div>
 
         {{$eventResults := (get_schedule_events .)}}
-        {{$scheduleStartAtMeta := $eventResults.Resource.GetMeta "ScheduleStartAt"}}
-        {{$scheduleEndAtMeta := $eventResults.Resource.GetMeta "ScheduleEndAt"}}
+        {{$scheduleStartAtMeta := $eventResults.Resource.GetMeta "ScheduledStartAt"}}
+        {{$scheduleEndAtMeta := $eventResults.Resource.GetMeta "ScheduledEndAt"}}
         {{if len $eventResults}}
         <div class="qor-filter__block-events">
           <label class="qor-field__label">{{t "qor_publish.schedule.events" "Events"}}</label>

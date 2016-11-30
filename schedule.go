@@ -4,12 +4,13 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/qor/validations"
 )
 
 type Schedule struct {
 	ScheduledStartAt *time.Time `gorm:"index"`
 	ScheduledEndAt   *time.Time `gorm:"index"`
-	ScheduleEventID  *uint
+	ScheduledEventID *uint
 }
 
 func (schedule *Schedule) GetScheduledStartAt() *time.Time {
@@ -28,8 +29,8 @@ func (schedule *Schedule) SetScheduledEndAt(t *time.Time) {
 	schedule.ScheduledEndAt = t
 }
 
-func (schedule *Schedule) GetScheduleEventID() *uint {
-	return schedule.ScheduleEventID
+func (schedule *Schedule) GetScheduledEventID() *uint {
+	return schedule.ScheduledEventID
 }
 
 type ScheduledInterface interface {
@@ -37,16 +38,22 @@ type ScheduledInterface interface {
 	SetScheduledStartAt(*time.Time)
 	GetScheduledEndAt() *time.Time
 	SetScheduledEndAt(*time.Time)
-	GetScheduleEventID() *uint
+	GetScheduledEventID() *uint
 }
 
-type ScheduleEvent struct {
+type ScheduledEvent struct {
 	gorm.Model
-	Name            string
-	ScheduleStartAt *time.Time
-	ScheduleEndAt   *time.Time
+	Name             string
+	ScheduledStartAt *time.Time
+	ScheduledEndAt   *time.Time
 }
 
-func (ScheduleEvent) AfterUpdate(tx *gorm.DB) {
+func (scheduledEvent ScheduledEvent) BeforeSave(tx *gorm.DB) {
+	if scheduledEvent.Name == "" {
+		tx.AddError(validations.NewError(scheduledEvent, "Name", "Name can not be empty"))
+	}
+}
+
+func (scheduledEvent ScheduledEvent) AfterUpdate(tx *gorm.DB) {
 	// sync time changes
 }

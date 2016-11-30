@@ -2,7 +2,7 @@
 {{$result := .Result}}
 {{$creating_new_version := .Context.Request.URL.Query.Get "new_version"}}
 
-{{$scheduleEventIDMeta := $resource.GetMeta "ScheduleEventID"}}
+{{$scheduleEventIDMeta := $resource.GetMeta "ScheduledEventID"}}
 {{$scheduleEvent := (get_schedule_event $result .)}}
 
 <div class="qor-form-container qor-pulish2__action">

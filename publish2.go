@@ -42,13 +42,14 @@ func enablePublishMode(res resource.Resourcer) {
 
 			if IsSchedulableModel(res.Value) {
 				res.Meta(&admin.Meta{
-					Name: "ScheduleEventID",
-					Type: "hidden",
+					Name:  "ScheduledEventID",
+					Label: "Scheduled Event",
+					Type:  "hidden",
 				})
 
-				res.IndexAttrs(res.IndexAttrs(), "-ScheduleEventID")
-				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
-				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduleEventID")
+				res.IndexAttrs(res.IndexAttrs(), "-ScheduledEventID")
+				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
+				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
 
 				if res.GetAdmin().GetResource(utils.ModelType(&Publish{}).Name()) == nil {
 					res.GetAdmin().AddResource(&Publish{})
@@ -137,10 +138,10 @@ func enablePublishMode(res resource.Resourcer) {
 
 			res.GetAdmin().RegisterFuncMap("get_schedule_event", func(record interface{}, context *admin.Context) interface{} {
 				if scheduledInterface, ok := record.(ScheduledInterface); ok {
-					var scheduleEvent ScheduleEvent
-					if scheduledInterface.GetScheduleEventID() != nil {
-						context.GetDB().First(&scheduleEvent, "id = ?", scheduledInterface.GetScheduleEventID())
-						return scheduleEvent
+					var scheduledEvent ScheduledEvent
+					if scheduledInterface.GetScheduledEventID() != nil {
+						context.GetDB().First(&scheduledEvent, "id = ?", scheduledInterface.GetScheduledEventID())
+						return scheduledEvent
 					}
 				}
 				return nil
@@ -151,7 +152,7 @@ func enablePublishMode(res resource.Resourcer) {
 			})
 
 			res.GetAdmin().RegisterFuncMap("get_schedule_events", func(context *admin.Context) interface{} {
-				res := context.Admin.GetResource("ScheduleEvent")
+				res := context.Admin.GetResource("ScheduledEvent")
 				scheduleEvents := res.NewSlice()
 				context.GetDB().Find(scheduleEvents)
 				return map[string]interface{}{"Resource": res, "Events": scheduleEvents}
@@ -184,9 +185,9 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 
 		Admin := res.GetAdmin()
 
-		if res.GetAdmin().GetResource("ScheduleEvent") == nil {
-			Admin.AddResource(&ScheduleEvent{}, &admin.Config{Menu: res.Config.Menu, Priority: -1})
-			Admin.Config.DB.AutoMigrate(&ScheduleEvent{})
+		if res.GetAdmin().GetResource("ScheduledEvent") == nil {
+			Admin.AddResource(&ScheduledEvent{}, &admin.Config{Menu: res.Config.Menu, Priority: -1})
+			Admin.Config.DB.AutoMigrate(&ScheduledEvent{})
 		}
 
 		Admin.GetRouter().Use(&admin.Middleware{
