@@ -1,6 +1,5 @@
 {{$resource := .Resource}}
 {{$result := .Result}}
-{{$creating_new_version := .Context.Request.URL.Query.Get "new_version"}}
 
 {{$scheduleEventIDMeta := $resource.GetMeta "ScheduledEventID"}}
 {{$scheduleEvent := (get_schedule_event $result .)}}
@@ -17,12 +16,8 @@
 
           <div class="qor-field__edit">
             <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
-              {{if $creating_new_version}}
-                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready">
-              {{else}}
-                {{$publishReadyValue := (raw_value_of $result $publishReadyMeta)}}
-                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}}>
-              {{end}}
+              {{$publishReadyValue := (raw_value_of $result $publishReadyMeta)}}
+              <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}}>
               <span class="mdl-switch__label"></span>
             </label>
           </div>

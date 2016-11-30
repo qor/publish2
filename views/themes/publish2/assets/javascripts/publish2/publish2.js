@@ -263,6 +263,8 @@
             $(element[$this.data().actionType]).closest('.qor-form-section').hide();
         });
 
+        $(CLASS_PUBLISH_ACTION_INPUT).trigger(EVENT_CHANGE);
+
     };
 
     QorPublish2.DEFAULTS = {};
