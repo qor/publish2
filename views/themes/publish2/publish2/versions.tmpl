@@ -11,7 +11,7 @@
   <tbody>
     {{range $result := .Result}}
       {{$primaryKey := primary_key_of $result}}
-      {{$recordURL := (printf "%v?version_name=%v" (url_for $result $resource) $result.GetVersionName)}}
+      {{$recordURL := (url_for $result $resource)}}
       <tr data-primary-key="{{$primaryKey}}" data-url="{{$recordURL}}">
         {{range $meta := $version_metas}}
           <td class="mdl-data-table__cell--non-numeric">{{render_meta $result $meta}}</td>

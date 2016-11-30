@@ -84,9 +84,9 @@ func enablePublishMode(res resource.Resourcer) {
 					URLOpenType: "slideout",
 					URL: func(record interface{}, context *admin.Context) string {
 						if versionable, ok := record.(VersionableInterface); ok {
-							url := context.URLFor(record) + "?new_version=true&"
+							url, _ := utils.PatchURL(context.URLFor(record), "new_version", "true")
 							if versionName := versionable.GetVersionName(); versionName != "" {
-								url = url + "&version_name=" + versionName
+								url, _ = utils.PatchURL(url, "version_name", versionName)
 							}
 							return url
 						}
