@@ -229,6 +229,10 @@
                 $(this).is(':checked') ? $input.val('true') : $input.val('');
             });
 
+            if ($input.val() == "true") {
+              $template.find('input').prop('checked', true);
+            }
+
             $template.prependTo($field).trigger('enable');
             $input.closest('.qor-field').hide();
         });
