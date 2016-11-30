@@ -3,6 +3,7 @@ package publish2
 import (
 	"fmt"
 	"path"
+	"regexp"
 
 	"github.com/qor/admin"
 	"github.com/qor/qor"
@@ -222,6 +223,12 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 				if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
 					if t, err := utils.ParseTime(endAt, context.Context); err == nil {
 						tx = tx.Set(ScheduleEnd, t).Set(VersionMode, VersionMultipleMode)
+					}
+				}
+
+				for key, value := range context.Request.URL.Query() {
+					if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
+						tx = tx.Set(VersionNameMode, value)
 					}
 				}
 
