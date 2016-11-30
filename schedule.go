@@ -48,6 +48,10 @@ type ScheduledEvent struct {
 	ScheduledEndAt   *time.Time
 }
 
+func (scheduledEvent ScheduledEvent) ToParam() string {
+	return "scheduled_events"
+}
+
 func (scheduledEvent ScheduledEvent) BeforeSave(tx *gorm.DB) {
 	if scheduledEvent.Name == "" {
 		tx.AddError(validations.NewError(scheduledEvent, "Name", "Name can not be empty"))
