@@ -85,42 +85,42 @@ func TestL10nWithVersions(t *testing.T) {
 		t.Errorf("Should only find one valid product, but got %v", count)
 	}
 
-	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(-time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledTime, now.Add(-time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("EN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(-time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledTime, now.Add(-time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("CN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledTime, now.Add(time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("EN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleCurrent, now.Add(time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledTime, now.Add(time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 1 {
 		t.Errorf("CN: Should only find one valid product when scheduled time, but got %v", count)
 	}
 
-	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledStart, now.Add(time.Hour)).Set(publish2.ScheduledEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("EN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledStart, now.Add(time.Hour)).Set(publish2.ScheduledEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 1 {
 		t.Errorf("CN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(-time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbEN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledStart, now.Add(-time.Hour)).Set(publish2.ScheduledEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 3 {
 		t.Errorf("EN: Should only find two valid product when scheduled time, but got %v", count)
 	}
 
-	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduleStart, now.Add(-time.Hour)).Set(publish2.ScheduleEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
+	dbCN.Set(publish2.VersionMode, publish2.VersionMultipleMode).Set(publish2.ScheduledStart, now.Add(-time.Hour)).Set(publish2.ScheduledEnd, now.Add(24*time.Hour)).Model(&L10nProduct{}).Where("id = ?", product.ID).Count(&count)
 	if count != 2 {
 		t.Errorf("CN: Should only find two valid product when scheduled time, but got %v", count)
 	}

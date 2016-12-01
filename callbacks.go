@@ -16,10 +16,10 @@ const (
 	VersionNameMode     = "publish:version:name"
 	VersionMultipleMode = "multiple"
 
-	ScheduleMode    = "publish:schedule:mode"
-	ScheduleCurrent = "publish:schedule:current"
-	ScheduleStart   = "publish:schedule:start"
-	ScheduleEnd     = "publish:schedule:end"
+	ScheduleMode   = "publish:schedule:mode"
+	ScheduledTime  = "publish:schedule:current"
+	ScheduledStart = "publish:schedule:start"
+	ScheduledEnd   = "publish:schedule:end"
 
 	VisibleMode = "publish:visible:mode"
 )
@@ -76,7 +76,7 @@ func queryCallback(scope *gorm.Scope) {
 		var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
 		var mode, _ = scope.DB().Get(ScheduleMode)
 
-		if v, ok := scope.Get(ScheduleStart); ok {
+		if v, ok := scope.Get(ScheduledStart); ok {
 			if t, ok := v.(*time.Time); ok {
 				scheduledStartTime = t
 			} else if t, ok := v.(time.Time); ok {
@@ -89,7 +89,7 @@ func queryCallback(scope *gorm.Scope) {
 			}
 		}
 
-		if v, ok := scope.Get(ScheduleEnd); ok {
+		if v, ok := scope.Get(ScheduledEnd); ok {
 			if t, ok := v.(*time.Time); ok {
 				scheduledEndTime = t
 			} else if t, ok := v.(time.Time); ok {
@@ -103,7 +103,7 @@ func queryCallback(scope *gorm.Scope) {
 		}
 
 		if len(conditions) == 0 && mode != ModeOff {
-			if v, ok := scope.Get(ScheduleCurrent); ok {
+			if v, ok := scope.Get(ScheduledTime); ok {
 				if t, ok := v.(*time.Time); ok {
 					scheduledCurrentTime = t
 				} else if t, ok := v.(time.Time); ok {

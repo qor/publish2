@@ -216,13 +216,13 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 
 				if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
 					if t, err := utils.ParseTime(startAt, context.Context); err == nil {
-						tx = tx.Set(ScheduleStart, t).Set(VersionMode, VersionMultipleMode)
+						tx = tx.Set(ScheduledStart, t).Set(VersionMode, VersionMultipleMode)
 					}
 				}
 
 				if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
 					if t, err := utils.ParseTime(endAt, context.Context); err == nil {
-						tx = tx.Set(ScheduleEnd, t).Set(VersionMode, VersionMultipleMode)
+						tx = tx.Set(ScheduledEnd, t).Set(VersionMode, VersionMultipleMode)
 					}
 				}
 

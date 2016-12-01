@@ -28,7 +28,7 @@ func TestSchedule(t *testing.T) {
 		t.Errorf("Should not find records that not in scheduled")
 	}
 
-	if DB.Set(publish2.ScheduleCurrent, oneDayAgo.Add(-time.Hour)).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
+	if DB.Set(publish2.ScheduledTime, oneDayAgo.Add(-time.Hour)).First(&Discount{}, "id = ?", discount.ID).RecordNotFound() {
 		t.Errorf("Should find records that in scheduled with set schedule mode")
 	}
 
@@ -65,12 +65,12 @@ func TestScheduleWithStartAndEnd(t *testing.T) {
 	DB.Create(&discountV2)
 
 	var count uint
-	DB.Set(publish2.ScheduleCurrent, now.Add(-time.Hour)).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	DB.Set(publish2.ScheduledTime, now.Add(-time.Hour)).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
 	if count != 1 {
 		t.Errorf("Should find one discount with scheduled now, but got %v", count)
 	}
 
-	DB.Set(publish2.ScheduleStart, now.Add(-time.Hour)).Set(publish2.ScheduleEnd, oneDayLater).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
+	DB.Set(publish2.ScheduledStart, now.Add(-time.Hour)).Set(publish2.ScheduledEnd, oneDayLater).Model(&Discount{}).Where("id IN (?)", []uint{discountV1.ID, discountV2.ID}).Count(&count)
 	if count != 2 {
 		t.Errorf("Should find two discounts with scheduled time range, but got %v", count)
 	}
@@ -107,7 +107,7 @@ func TestScheduleWithVisible(t *testing.T) {
 		t.Errorf("Should be able to find created record that visible")
 	}
 
-	if !DB.Set(publish2.ScheduleCurrent, oneDayLater.Add(time.Hour)).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
+	if !DB.Set(publish2.ScheduledTime, oneDayLater.Add(time.Hour)).First(&Campaign{}, "id = ?", campaign.ID).RecordNotFound() {
 		t.Errorf("Should not be able to find created record that not in schedule")
 	}
 }
