@@ -229,7 +229,7 @@ func updateVersionPriority(scope *gorm.Scope) {
 			scheduledTime = &unix
 		}
 
-		priority := fmt.Sprintf("%v_%v", scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
+		priority := fmt.Sprintf("%v_%v_%v", scope.PrimaryKeyValue(), scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
 		field.Set(priority)
 	}
 }

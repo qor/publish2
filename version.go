@@ -1,6 +1,6 @@
 package publish2
 
-var DefaultVersionName = "default"
+var DefaultVersionName = "Default"
 
 type Version struct {
 	VersionName     string `gorm:"primary_key"`
