@@ -173,7 +173,7 @@ func enablePublishMode(res resource.Resourcer) {
 					scope        = db.NewScope(record)
 					primaryField = scope.PrimaryField()
 				)
-				db.Set(fmt.Sprintf("primary_key[%v_version_name]", scope.TableName()), "").Model(context.Resource.NewStruct()).Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).Count(&count)
+				db.Set(admin.DisableCompositePrimaryKeyMode, "on").Model(context.Resource.NewStruct()).Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).Count(&count)
 				return count
 			})
 		}

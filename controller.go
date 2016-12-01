@@ -52,7 +52,7 @@ func (ctr controller) Dashboard(context *admin.Context) {
 
 func (ctr controller) Versions(context *admin.Context) {
 	records := context.Resource.NewSlice()
-	context.GetDB().Set(VersionMode, VersionMultipleMode).Set(ScheduleMode, ModeOff).Set(VisibleMode, ModeOff).Find(records, fmt.Sprintf("%v = ?", context.Resource.PrimaryDBName()), context.ResourceID)
+	context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(VersionMode, VersionMultipleMode).Set(ScheduleMode, ModeOff).Set(VisibleMode, ModeOff).Find(records, fmt.Sprintf("%v = ?", context.Resource.PrimaryDBName()), context.ResourceID)
 
 	result := context.Funcs(template.FuncMap{
 		"version_metas": func() (metas []*admin.Meta) {
