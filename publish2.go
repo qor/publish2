@@ -208,6 +208,33 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 			Admin.AddResource(&ScheduledEvent{}, &admin.Config{Name: "Event", Menu: res.Config.Menu, Priority: -1})
 			Admin.Config.DB.AutoMigrate(&ScheduledEvent{})
 		}
+		scheduledEventResource := res.GetAdmin().GetResource("ScheduledEvent")
+		scheduledEventResource.AddProcessor(func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
+			var (
+				db             = context.GetDB()
+				scope          = db.NewScope(record)
+				startAt, endAt interface{}
+			)
+
+			if field, ok := scope.FieldByName("ScheduledStartAt"); ok {
+				startAt = field.Field.Interface()
+			}
+			if field, ok := scope.FieldByName("ScheduledEndAt"); ok {
+				endAt = field.Field.Interface()
+			}
+
+			if startAt != nil || endAt != nil {
+				for _, res := range res.GetAdmin().GetResources() {
+					if IsSchedulableModel(res.Value) {
+						if err := db.Model(res.Value).Set("l10n:mode", "unscoped").Where("scheduled_event_id = ?", scope.PrimaryKeyValue()).UpdateColumns(map[string]interface{}{"scheduled_start_at": startAt, "scheduled_end_at": endAt}).Error; err != nil {
+							return err
+						}
+					}
+				}
+			}
+
+			return nil
+		})
 
 		Admin.GetRouter().Use(&admin.Middleware{
 			Name: "publish2",

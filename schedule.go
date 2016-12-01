@@ -57,7 +57,3 @@ func (scheduledEvent ScheduledEvent) BeforeSave(tx *gorm.DB) {
 		tx.AddError(validations.NewError(scheduledEvent, "Name", "Name can not be empty"))
 	}
 }
-
-func (scheduledEvent ScheduledEvent) AfterUpdate(tx *gorm.DB) {
-	// sync time changes
-}
