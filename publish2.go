@@ -169,7 +169,7 @@ func enablePublishMode(res resource.Resourcer) {
 			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
 				var (
 					count        int
-					db           = context.GetDB().Set(VersionMode, VersionMultipleMode)
+					db           = context.GetDB().New().Set(VersionNameMode, "").Set(VersionMode, VersionMultipleMode)
 					scope        = db.NewScope(record)
 					primaryField = scope.PrimaryField()
 				)
