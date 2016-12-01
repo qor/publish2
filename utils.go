@@ -13,8 +13,10 @@ func GetScheduledTime(request *http.Request, writer http.ResponseWriter) string 
 		scheduledTime = str
 	}
 
-	if cookie, err := request.Cookie("publish_scheduled_time"); err == nil {
-		scheduledTime = cookie.Value
+	if scheduledTime == "" {
+		if cookie, err := request.Cookie("publish_scheduled_time"); err == nil {
+			scheduledTime = cookie.Value
+		}
 	}
 
 	context := qor.Context{Request: request, Writer: writer}
