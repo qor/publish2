@@ -226,7 +226,7 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 			if startAt != nil || endAt != nil {
 				for _, res := range res.GetAdmin().GetResources() {
 					if IsSchedulableModel(res.Value) {
-						if err := db.Model(res.Value).Set("l10n:mode", "unscoped").Where("scheduled_event_id = ?", scope.PrimaryKeyValue()).UpdateColumns(map[string]interface{}{"scheduled_start_at": startAt, "scheduled_end_at": endAt}).Error; err != nil {
+						if err := db.Table(db.NewScope(res.Value).TableName()).Where("scheduled_event_id = ?", scope.PrimaryKeyValue()).UpdateColumns(map[string]interface{}{"scheduled_start_at": startAt, "scheduled_end_at": endAt}).Error; err != nil {
 							return err
 						}
 					}
