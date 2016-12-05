@@ -192,24 +192,24 @@ func fixPreloadCallback(scope *gorm.Scope) {
 		indirectFieldValue := reflect.Indirect(gormField.Field)
 		switch indirectFieldValue.Kind() {
 		case reflect.Slice:
-			results := map[string]reflect.Value{}
+			resultsMap := map[string]int{}
+			results := reflect.New(indirectFieldValue.Type()).Elem()
 
 			for i := 0; i < indirectFieldValue.Len(); i++ {
 				if shareableVersion, ok := indirectFieldValue.Index(i).Addr().Interface().(ShareableVersionInterface); ok {
 					fieldPrimaryValue := fmt.Sprint(scope.New(shareableVersion).PrimaryKeyValue())
-					if _, ok := results[fieldPrimaryValue]; !ok || shareableVersion.GetSharedVersionName() == versionName {
-						if shareableVersion.GetSharedVersionName() == versionName || shareableVersion.GetSharedVersionName() == "" {
-							results[fieldPrimaryValue] = indirectFieldValue.Index(i)
-						}
+					idx, ok := resultsMap[fieldPrimaryValue]
+
+					if !ok && (shareableVersion.GetSharedVersionName() == versionName || shareableVersion.GetSharedVersionName() == "") {
+						resultsMap[fieldPrimaryValue] = results.Len()
+						results = reflect.Append(results, indirectFieldValue.Index(i))
+					} else if shareableVersion.GetSharedVersionName() == versionName {
+						results.Index(idx).Set(indirectFieldValue.Index(i))
 					}
 				}
 			}
 
-			fieldResults := reflect.New(indirectFieldValue.Type()).Elem()
-			for _, v := range results {
-				fieldResults = reflect.Append(fieldResults, v)
-			}
-			gormField.Set(fieldResults)
+			gormField.Set(results)
 		case reflect.Struct:
 			if shareableVersion, ok := indirectFieldValue.Interface().(ShareableVersionInterface); ok {
 				if shareableVersion.GetSharedVersionName() != "" && shareableVersion.GetSharedVersionName() != versionName {
@@ -226,8 +226,8 @@ func fixPreloadCallback(scope *gorm.Scope) {
 		case reflect.Slice:
 			for i := 0; i < reflectValue.Len(); i++ {
 				v := reflectValue.Index(i)
-				if versionable, ok := v.Interface().(VersionableInterface); ok {
-					if fieldValue, ok := scope.New(v.Interface()).FieldByName(fieldName); ok {
+				if versionable, ok := v.Addr().Interface().(VersionableInterface); ok {
+					if fieldValue, ok := scope.New(v.Addr().Interface()).FieldByName(fieldName); ok {
 						filterFilterValuesWithVersion(fieldValue, versionable.GetVersionName())
 					}
 				}

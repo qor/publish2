@@ -64,7 +64,7 @@ func TestSharedVersions(t *testing.T) {
 	product2 := prepareSharedVersionProduct()
 
 	var product1V1 SharedVersionProduct
-	DB.Preload("ColorVariations").Find(&product1V1, "id = ?", product1.ID)
+	DB.Set(publish2.VersionNameMode, "v1").Preload("ColorVariations").Find(&product1V1, "id = ?", product1.ID)
 
 	if len(product1V1.ColorVariations) != 2 {
 		t.Errorf("Preload: Should have 2 color variations for product v1, but got %v", len(product1V1.ColorVariations))
@@ -77,7 +77,7 @@ func TestSharedVersions(t *testing.T) {
 	}
 
 	var product1V2 SharedVersionProduct
-	DB.Preload("ColorVariations").Find(&product1V2, "id = ?", product1.ID)
+	DB.Set(publish2.VersionNameMode, "v2").Preload("ColorVariations").Find(&product1V2, "id = ?", product1.ID)
 
 	if len(product1V2.ColorVariations) != 3 {
 		t.Errorf("Preload: Should have 3 color variations for product v2, but got %v", len(product1V2.ColorVariations))
@@ -88,7 +88,7 @@ func TestSharedVersions(t *testing.T) {
 
 	var product2V2 SharedVersionProduct
 	for _, p := range products {
-		if p.ID == product2.ID {
+		if p.ID == product2.ID && p.VersionName == "v2" {
 			product2V2 = p
 		}
 	}
