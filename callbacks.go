@@ -54,6 +54,7 @@ func IsPublishReadyableModel(model interface{}) (ok bool) {
 
 func RegisterCallbacks(db *gorm.DB) {
 	db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
+	db.Callback().Query().After("gorm:preload").Register("publish:fix_preload", fixPreloadCallback)
 	db.Callback().RowQuery().Before("gorm:query").Register("publish:query", queryCallback)
 
 	db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
@@ -183,6 +184,69 @@ func queryCallback(scope *gorm.Scope) {
 		}
 
 		scope.Search.Where(strings.Join(conditions, " AND "), conditionValues...)
+	}
+}
+
+func fixPreloadCallback(scope *gorm.Scope) {
+	filterFilterValuesWithVersion := func(gormField *gorm.Field, versionName string) {
+		indirectFieldValue := reflect.Indirect(gormField.Field)
+		switch indirectFieldValue.Kind() {
+		case reflect.Slice:
+			results := map[string]reflect.Value{}
+
+			for i := 0; i < indirectFieldValue.Len(); i++ {
+				if shareableVersion, ok := indirectFieldValue.Index(i).Addr().Interface().(ShareableVersionInterface); ok {
+					fieldPrimaryValue := fmt.Sprint(scope.New(shareableVersion).PrimaryKeyValue())
+					if _, ok := results[fieldPrimaryValue]; !ok || shareableVersion.GetSharedVersionName() == versionName {
+						if shareableVersion.GetSharedVersionName() == versionName || shareableVersion.GetSharedVersionName() == "" {
+							results[fieldPrimaryValue] = indirectFieldValue.Index(i)
+						}
+					}
+				}
+			}
+
+			fieldResults := reflect.New(indirectFieldValue.Type()).Elem()
+			for _, v := range results {
+				fieldResults = reflect.Append(fieldResults, v)
+			}
+			gormField.Set(fieldResults)
+		case reflect.Struct:
+			if shareableVersion, ok := indirectFieldValue.Interface().(ShareableVersionInterface); ok {
+				if shareableVersion.GetSharedVersionName() != "" && shareableVersion.GetSharedVersionName() != versionName {
+					gormField.Set(reflect.New(indirectFieldValue.Type()))
+				}
+			}
+		}
+	}
+
+	fixSharedVersionRecords := func(value interface{}, fieldName string) {
+		reflectValue := reflect.Indirect(reflect.ValueOf(value))
+
+		switch reflectValue.Kind() {
+		case reflect.Slice:
+			for i := 0; i < reflectValue.Len(); i++ {
+				v := reflectValue.Index(i)
+				if versionable, ok := v.Interface().(VersionableInterface); ok {
+					if fieldValue, ok := scope.New(v.Interface()).FieldByName(fieldName); ok {
+						filterFilterValuesWithVersion(fieldValue, versionable.GetVersionName())
+					}
+				}
+			}
+		case reflect.Struct:
+			if versionable, ok := value.(VersionableInterface); ok {
+				if fieldValue, ok := scope.New(value).FieldByName(fieldName); ok {
+					filterFilterValuesWithVersion(fieldValue, versionable.GetVersionName())
+				}
+			}
+		}
+	}
+
+	if IsVersionableModel(scope.Value) {
+		for _, field := range scope.Fields() {
+			if IsShareableVersionModel(reflect.New(field.Struct.Type).Interface()) {
+				fixSharedVersionRecords(scope.Value, field.Name)
+			}
+		}
 	}
 }
 

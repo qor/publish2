@@ -67,14 +67,20 @@ func TestSharedVersions(t *testing.T) {
 	DB.Preload("ColorVariations").Find(&product1V1, "id = ?", product1.ID)
 
 	if len(product1V1.ColorVariations) != 2 {
-		t.Errorf("Should have 2 color variations for product v1, but got %v", len(product1V1.ColorVariations))
+		t.Errorf("Preload: Should have 2 color variations for product v1, but got %v", len(product1V1.ColorVariations))
+	}
+
+	var colorVariations1V1 []SharedVersionColorVariation
+	DB.Model(&product1V1).Related(&colorVariations1V1)
+	if len(colorVariations1V1) != 2 {
+		t.Errorf("Related: Should have 2 color variations for product v1, but got %v", len(colorVariations1V1))
 	}
 
 	var product1V2 SharedVersionProduct
 	DB.Preload("ColorVariations").Find(&product1V2, "id = ?", product1.ID)
 
 	if len(product1V2.ColorVariations) != 3 {
-		t.Errorf("Should have 3 color variations for product v2, but got %v", len(product1V2.ColorVariations))
+		t.Errorf("Preload: Should have 3 color variations for product v2, but got %v", len(product1V2.ColorVariations))
 	}
 
 	var products []SharedVersionProduct
@@ -88,6 +94,6 @@ func TestSharedVersions(t *testing.T) {
 	}
 
 	if len(product2V2.ColorVariations) != 3 {
-		t.Errorf("Should have 3 color variations for product v2, but got %v", len(product2V2.ColorVariations))
+		t.Errorf("Preload: Should have 3 color variations for product v2, but got %v", len(product2V2.ColorVariations))
 	}
 }
