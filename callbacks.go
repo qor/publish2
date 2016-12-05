@@ -166,7 +166,18 @@ func queryCallback(scope *gorm.Scope) {
 		scope.Search.Order("version_priority DESC")
 	} else {
 		if isShareableVersion {
-			if versionName, ok := scope.DB().Get(VersionNameMode); ok && versionName != "" {
+			var versionName string
+			if source, ok := scope.DB().Get("gorm:association:source"); ok {
+				if versionable, ok := source.(VersionableInterface); ok {
+					versionName = versionable.GetVersionName()
+				}
+			}
+
+			if v, ok := scope.DB().Get(VersionNameMode); ok && fmt.Sprint(v) != "" {
+				versionName = fmt.Sprint(v)
+			}
+
+			if versionName != "" {
 				var primaryKeys []string
 				for _, primaryField := range scope.PrimaryFields() {
 					if primaryField.DBName != "version_name" {
