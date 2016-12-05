@@ -9,7 +9,10 @@ import (
 var DB = utils.TestDB()
 
 func init() {
-	models := []interface{}{&Wiki{}, &Post{}, &Article{}, &Discount{}, &User{}, &Campaign{}, &Product{}, &L10nProduct{}}
+	models := []interface{}{
+		&Wiki{}, &Post{}, &Article{}, &Discount{}, &User{}, &Campaign{},
+		&Product{}, &L10nProduct{}, &SharedVersionProduct{}, &SharedVersionColorVariation{}, &SharedVersionSizeVariation{},
+	}
 
 	DB.DropTableIfExists(models...)
 	DB.AutoMigrate(models...)
