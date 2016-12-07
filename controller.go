@@ -17,12 +17,13 @@ type visiblePublishResourceInterface interface {
 }
 
 func (ctr controller) Dashboard(context *admin.Context) {
-	type result struct {
-		Resource *admin.Resource
-		Results  interface{}
+	type resourceResult struct {
+		Resource            *admin.Resource
+		ComingOnlineResults interface{}
+		GoingOfflineResults interface{}
 	}
 
-	var results = []result{}
+	var results = []resourceResult{}
 
 	for _, res := range context.Admin.GetResources() {
 		if IsSchedulableModel(res.Value) {
@@ -35,13 +36,20 @@ func (ctr controller) Dashboard(context *admin.Context) {
 			}
 
 			db := context.GetDB()
+			result := resourceResult{Resource: res}
 
-			data := res.NewSlice()
-			if db.Set(VersionMode, VersionMultipleMode).Find(data).RowsAffected > 0 {
-				results = append(results, result{
-					Resource: res,
-					Results:  data,
-				})
+			comingOnlineData := res.NewSlice()
+			if db.Set(ScheduleMode, ComingOnlineMode).Set(VersionMode, VersionMultipleMode).Find(comingOnlineData).RowsAffected > 0 {
+				result.ComingOnlineResults = comingOnlineData
+			}
+
+			goingOfflineData := res.NewSlice()
+			if db.Set(ScheduleMode, GoingOfflineMode).Set(VersionMode, VersionMultipleMode).Find(goingOfflineData).RowsAffected > 0 {
+				result.GoingOfflineResults = goingOfflineData
+			}
+
+			if result.ComingOnlineResults != nil || result.GoingOfflineResults != nil {
+				results = append(results, result)
 			}
 		}
 	}

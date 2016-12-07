@@ -12,14 +12,17 @@ import (
 
 const (
 	ModeOff             = "off"
+	ModeReverse         = "reverse"
 	VersionMode         = "publish:version:mode"
 	VersionNameMode     = "publish:version:name"
 	VersionMultipleMode = "multiple"
 
-	ScheduleMode   = "publish:schedule:mode"
-	ScheduledTime  = "publish:schedule:current"
-	ScheduledStart = "publish:schedule:start"
-	ScheduledEnd   = "publish:schedule:end"
+	ScheduleMode     = "publish:schedule:mode"
+	ComingOnlineMode = "coming_online"
+	GoingOfflineMode = "going_offline"
+	ScheduledTime    = "publish:schedule:current"
+	ScheduledStart   = "publish:schedule:start"
+	ScheduledEnd     = "publish:schedule:end"
 
 	VisibleMode = "publish:visible:mode"
 )
@@ -74,8 +77,13 @@ func queryCallback(scope *gorm.Scope) {
 	)
 
 	if isSchedulable {
-		var scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
-		var mode, _ = scope.DB().Get(ScheduleMode)
+		var (
+			scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
+			mode, _                                                    = scope.DB().Get(ScheduleMode)
+			comingOnlineMode                                           = mode == ComingOnlineMode
+			goingOfflineMode                                           = mode == GoingOfflineMode
+			modeON                                                     = (mode != ModeOff) && !comingOnlineMode && !goingOfflineMode
+		)
 
 		if v, ok := scope.Get(ScheduledStart); ok {
 			if t, ok := v.(*time.Time); ok {
@@ -85,8 +93,16 @@ func queryCallback(scope *gorm.Scope) {
 			}
 
 			if scheduledStartTime != nil {
-				conditions = append(conditions, "(scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-				conditionValues = append(conditionValues, scheduledStartTime)
+				if comingOnlineMode {
+					conditions = append(conditions, "scheduled_start_at >= ?")
+					conditionValues = append(conditionValues, scheduledStartTime)
+				} else if goingOfflineMode {
+					conditions = append(conditions, "scheduled_end_at >= ?")
+					conditionValues = append(conditionValues, scheduledStartTime)
+				} else if modeON {
+					conditions = append(conditions, "(scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+					conditionValues = append(conditionValues, scheduledStartTime)
+				}
 			}
 		}
 
@@ -98,12 +114,20 @@ func queryCallback(scope *gorm.Scope) {
 			}
 
 			if scheduledEndTime != nil {
-				conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?)")
-				conditionValues = append(conditionValues, scheduledEndTime)
+				if comingOnlineMode {
+					conditions = append(conditions, "scheduled_start_at <= ?")
+					conditionValues = append(conditionValues, scheduledEndTime)
+				} else if goingOfflineMode {
+					conditions = append(conditions, "scheduled_end_at <= ?")
+					conditionValues = append(conditionValues, scheduledEndTime)
+				} else if modeON {
+					conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?)")
+					conditionValues = append(conditionValues, scheduledEndTime)
+				}
 			}
 		}
 
-		if len(conditions) == 0 && mode != ModeOff {
+		if len(conditions) == 0 {
 			if v, ok := scope.Get(ScheduledTime); ok {
 				if t, ok := v.(*time.Time); ok {
 					scheduledCurrentTime = t
@@ -117,8 +141,16 @@ func queryCallback(scope *gorm.Scope) {
 				scheduledCurrentTime = &now
 			}
 
-			conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
-			conditionValues = append(conditionValues, scheduledCurrentTime, scheduledCurrentTime)
+			if comingOnlineMode {
+				conditions = append(conditions, "scheduled_start_at >= ?")
+				conditionValues = append(conditionValues, scheduledCurrentTime)
+			} else if goingOfflineMode {
+				conditions = append(conditions, "scheduled_end_at >= ?")
+				conditionValues = append(conditionValues, scheduledCurrentTime)
+			} else if modeON {
+				conditions = append(conditions, "(scheduled_start_at IS NULL OR scheduled_start_at <= ?) AND (scheduled_end_at IS NULL OR scheduled_end_at >= ?)")
+				conditionValues = append(conditionValues, scheduledCurrentTime, scheduledCurrentTime)
+			}
 		}
 	}
 
