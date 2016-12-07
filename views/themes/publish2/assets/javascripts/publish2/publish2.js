@@ -218,11 +218,17 @@
                 $field = $input.closest('.qor-fieldset'),
                 $template;
 
+
+            if ($field.hasClass('.qor-fieldset--new')) {
+                return;
+            }
+
             if ($element) {
                 $field.find(CLASS_PUBLISH_ACTION_SHAREDVERSION).remove();
             }
+
             randomString = (Math.random() + 1).toString(36).substring(7);
-            data.id = NAME_SHAREABLEVERSION + '_' + randomString;
+            data.id = [NAME_SHAREABLEVERSION, randomString].join('_');
             $template = $(window.Mustache.render(sharedVersion, data));
 
             $template.find('input').on(EVENT_CLICK, function() {
@@ -230,7 +236,7 @@
             });
 
             if ($input.val() == "true") {
-              $template.find('input').prop('checked', true);
+                $template.find('input').prop('checked', true);
             }
 
             $template.prependTo($field).trigger('enable');
