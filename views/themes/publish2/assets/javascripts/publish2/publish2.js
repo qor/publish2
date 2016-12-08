@@ -175,13 +175,17 @@
                 var $trs = $table.find(CLASS_MEDIALIBRARY_TR),
                     columnNum = parseInt($table.width() / 217),
                     currentNum = $trs.index($tr) + 1,
+                    rows = Math.ceil($trs.size() / columnNum),
                     currentRow = Math.ceil(currentNum / columnNum);
 
                 $tr = $($trs.get((columnNum * currentRow) - 1));
                 if (!$tr.size()) {
                     $tr = $trs.last();
                 }
-                $newRow = $('<tr class="' + VERSION_LIST + '" style="width: ' + (217 * columnNum - 16) + 'px"><td></td></tr>');
+                $newRow = $('<tr class="' + VERSION_LIST + '"><td></td></tr>');
+                if (rows > 1) {
+                    $newRow.width(217 * columnNum - 16);
+                }
             }
 
             $tr.after($newRow);
