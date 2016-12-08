@@ -48,7 +48,7 @@
     var CLASS_PUBLISH_ACTION_END = '.qor-pulish2__action-end';
     var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
     var CLASS_PICKER_BUTTON = '.qor-action__picker-button';
-    var CLASS_MEDIALIBRARY_TR = '.qor-table--medialibrary>tbody>tr';
+    var CLASS_MEDIALIBRARY_TR = '>tbody>tr';
 
     var IS_MEDIALIBRARY = 'qor-table--medialibrary';
     var IS_SHOW_VERSION = 'is-showing';
@@ -167,12 +167,12 @@
             }
 
             $(CLASS_VERSION_LIST).remove();
-            $table.find('tr').removeClass(IS_SHOW_VERSION);
+            $('table tr').removeClass(IS_SHOW_VERSION);
 
             $tr.addClass(IS_SHOW_VERSION);
 
             if (isMediaLibrary) {
-                var $trs = $(CLASS_MEDIALIBRARY_TR),
+                var $trs = $table.find(CLASS_MEDIALIBRARY_TR),
                     columnNum = parseInt($table.width() / 217),
                     currentNum = $trs.index($tr) + 1,
                     currentRow = Math.ceil(currentNum / columnNum);
