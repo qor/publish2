@@ -3,14 +3,41 @@
         float: left;
         z-index: 999;
         color: #333;
-        .qor-filter-toggle {
-            span,
-            i {
+        .qor-field__publishready {
+            padding-left: 16px;
+            label {
                 display: inline-block;
                 vertical-align: middle;
+                cursor: pointer;
+                margin-right: 32px;
             }
-            i {
-                font-size: 16px;
+        }
+        .qor-filter-toggle {
+            >span {
+                display: inline-block;
+                vertical-align: middle;
+                padding: 0 8px;
+                margin-right: 16px;
+                background-color: #fff;
+                line-height: 20px;
+                color: #333;
+                border: 2px solid #33c3f0;
+                position: relative;
+                i {
+                    font-size: 16px;
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    height: 20px;
+                    line-height: 20px;
+                    background-color: #33c3f0;
+                    color: #fff;
+                    width: 20px;
+                    text-align: center;
+                    +span {
+                        padding-right: 24px;
+                    }
+                }
             }
         }
         .qor-filter__block {

@@ -8,14 +8,26 @@
   <div class="qor-actions qor-actions__filter-time " data-toggle="qor.filter.time">
     <div class="qor-selector left-aligned">
       <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
-        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}">
-            {{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}
+        <span>
+          <span class="qor-publishready-label">
+              {{t "qor_publish.schedule.preview.all" "All"}}
+          </span>
+        </span>
+
+        <span>
+          <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}">
+              {{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}
+          </span>
         </span>
       </a>
     </div>
 
     <div class="qor-filter__block qor-filter__dropdown clearfix" style="display: none;">
 
+      <div class="qor-field__edit qor-field__publishready" data-search-param="publish_ready">
+        <label><input type="radio" name="QorResource.PublishReady" id="qor-publishready__off" value="0" data-label="{{t "qor_publish.schedule.preview.all" "All"}}" checked /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
+        <label><input type="radio" name="QorResource.PublishReady" id="qor-publishready__on" value="1" data-label="{{t "qor_publish.schedule.preview.publish_ready" "Publish Ready"}}" /> {{t "qor_publish.schedule.preview.publish_ready" "Publish Ready"}}</label>
+      </div>
       <div class="qor-field__edit qor-field__datetimepicker">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label">{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}</label>

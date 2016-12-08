@@ -38,8 +38,11 @@
             var $element = this.$element;
 
             this.$scheduleTime = $element.find(CLASS_SCHEDULED_TIME);
-            this.$searchParam = $element.find(CLASS_SEARCH_PARAM);
             this.$searchButton = $element.find(this.options.button);
+            this.$trigger = $element.find(this.options.trigger);
+
+            this.publishReadyOn = $('#qor-publishready__on').data().label;
+            this.publishReadyOff = $('#qor-publishready__off').data().label;
 
             this.initActionTemplate();
 
@@ -66,14 +69,34 @@
 
         initActionTemplate: function() {
             var scheduleTime = this.getUrlParameter('publish_scheduled_time'),
-                $filterToggle = $(this.options.trigger);
+                publishReady = this.getUrlParameter('publish_ready'),
+                $trigger = this.$trigger,
+                $selectorLabel = $trigger.find('.qor-selector-label'),
+                $publishReadyLabel = $trigger.find('.qor-publishready-label');
+
+
+            if (!(scheduleTime || publishReady)) {
+                return;
+            }
+
+            if (publishReady === 'true') {
+                $publishReadyLabel.html(this.publishReadyOn);
+                $publishReadyLabel.before('<i class="material-icons qor-selector-clear" data-type="publishready">clear</i>')
+                $('#qor-publishready__on').prop('checked', true);
+            } else {
+                $publishReadyLabel.html(this.publishReadyOff);
+                $('#qor-publishready__on').prop('checked', false);
+                $publishReadyLabel.next('i').remove();
+            }
 
             if (scheduleTime) {
                 this.$scheduleTime.val(scheduleTime);
-
-                $filterToggle.addClass('active clearable').find('.qor-selector-label').html(scheduleTime);
-                $filterToggle.append('<i class="material-icons qor-selector-clear">clear</i>');
+                $selectorLabel.html(scheduleTime);
+                $selectorLabel.before('<i class="material-icons qor-selector-clear">clear</i>');
             }
+
+
+
         },
 
         show: function() {
@@ -94,15 +117,21 @@
             $filter.hide();
         },
 
-        clear: function() {
-            var $trigger = $(this.options.trigger),
-                $label = $trigger.find('.qor-selector-label');
+        clear: function(e) {
+            var $element = $(e.target),
+                $trigger = this.$trigger,
+                $label = $trigger.find('.qor-selector-label'),
+                $publishReadyLabel = $trigger.find('.qor-publishready-label');
 
-            $trigger.removeClass('active clearable');
-            $label.html($label.data('label'));
-            $(this.options.trigger).find('i').remove();
-            this.$scheduleTime.val('');
+            if ($element.data().type) {
+                $publishReadyLabel.html(this.publishReadyOff);
+                $('#qor-publishready__on').prop('checked', false);
+            } else {
+                $label.html($label.data('label'));
+                this.$scheduleTime.val('');
+            }
 
+            $element.remove();
             this.$searchButton.click();
             return false;
 
@@ -130,7 +159,7 @@
         },
 
         search: function() {
-            var $searchParam = this.$searchParam,
+            var $searchParam = this.$element.find(CLASS_SEARCH_PARAM),
                 uri,
                 _this = this;
 
@@ -142,6 +171,10 @@
                 var $this = $(this),
                     searchParam = $this.data().searchParam,
                     val = $this.val();
+                if (searchParam == 'publish_ready') {
+                    val = !!Number($this.find('input:checked').val());
+                }
+
                 uri = _this.updateQueryStringParameter(searchParam, val, uri);
             });
 
