@@ -2,16 +2,15 @@
     <script src="{{ .RouterPrefix }}/assets/javascripts/datetimepicker.js"></script>
     <script src="{{ .RouterPrefix }}/assets/javascripts/publish2_inline_edit.js?theme=publish2"></script>
     <link type="text/css" rel="stylesheet" href="{{ .RouterPrefix }}/assets/stylesheets/datetimepicker.css" />
-
+    <link type="text/css" rel="stylesheet" href="{{ .RouterPrefix }}/assets/stylesheets/publish2_inline_edit.css?theme=publish2" />
 {{end}}
 
   <div class="qor-actions qor-actions__filter-time " data-toggle="qor.filter.time">
     <div class="qor-selector left-aligned">
       <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
-        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.schedule_time" "Schedule Time"}}">
+        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}">
             {{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}
         </span>
-        <i class="material-icons qor-selector-arrow">arrow_drop_down</i>
       </a>
     </div>
 
@@ -19,8 +18,8 @@
 
       <div class="qor-field__edit qor-field__datetimepicker">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-          <label class="qor-field__label mdl-textfield__label"></label>
-          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__scheduled-time" data-search-param="publish_scheduled_time" placeholder="" type="text" value="" />
+          <label class="qor-field__label">{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}</label>
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__scheduled-time" placeholder="YYYY-MM-DD" data-search-param="publish_scheduled_time" type="text" value="" />
         </div>
         <div>
           <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">

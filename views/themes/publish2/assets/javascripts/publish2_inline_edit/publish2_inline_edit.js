@@ -100,6 +100,7 @@
 
             $trigger.removeClass('active clearable');
             $label.html($label.data('label'));
+            $(this.options.trigger).find('i').remove();
             this.$scheduleTime.val('');
 
             this.$searchButton.click();
