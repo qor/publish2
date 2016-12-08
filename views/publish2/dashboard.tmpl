@@ -19,16 +19,20 @@
       </div>
 
       {{if $result.ComingOnlineResults}}
-        <div>
-          <span>{{t "qor_publish.Coming Online" "Coming Online"}}</span>
+        <div class="qor-section__col">
+          <div class="qor-section__header">
+            <h4 class="qor-section-title">{{t "qor_publish.Coming Online" "Coming Online"}}</h4>
+          </div>
 
           {{(new_resource_context $res).Render "index/table" $result.ComingOnlineResults}}
         </div>
       {{end}}
 
       {{if $result.GoingOfflineResults}}
-        <div>
-          <span>{{t "qor_publish.Going Online" "Going Offline"}}</span>
+        <div class="qor-section__col">
+          <div class="qor-section__header">
+            <h4 class="qor-section-title">{{t "qor_publish.Going Online" "Going Offline"}}</h4>
+          </div>
 
           {{(new_resource_context $res).Render "index/table" $result.GoingOfflineResults}}
         </div>
