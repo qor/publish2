@@ -180,22 +180,22 @@ func queryCallback(scope *gorm.Scope) {
 
 				for _, primaryField := range scope.PrimaryFields() {
 					if primaryField.DBName != "version_name" {
-						primaryKeys = append(primaryKeys, scope.Quote(primaryField.DBName))
+						primaryKeys = append(primaryKeys, fmt.Sprintf("%v.%v", scope.TableName(), primaryField.DBName))
 					}
 				}
 
 				primaryKeyCondition := strings.Join(primaryKeys, ",")
 				if len(conditions) == 0 {
-					sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition)
+					sql = fmt.Sprintf("(%v, %v.version_priority) IN (SELECT %v, MAX(%v.version_priority) FROM %v GROUP BY %v)", primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition, scope.QuotedTableName(), scope.QuotedTableName(), primaryKeyCondition)
 				} else {
-					sql = fmt.Sprintf("(%v, version_priority) IN (SELECT %v, MAX(version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, primaryKeyCondition, scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
+					sql = fmt.Sprintf("(%v, %v.version_priority) IN (SELECT %v, MAX(%v.version_priority) FROM %v WHERE %v GROUP BY %v)", primaryKeyCondition, scope.QuotedTableName(), primaryKeyCondition, scope.QuotedTableName(), scope.QuotedTableName(), strings.Join(conditions, " AND "), primaryKeyCondition)
 				}
 
 				scope.Search.Where(sql, conditionValues...)
 			}
 		}
 
-		scope.Search.Order("version_priority DESC")
+		scope.Search.Order(fmt.Sprintf("%v.version_priority DESC", scope.QuotedTableName()))
 	} else {
 		if isShareableVersion {
 			var versionName string
