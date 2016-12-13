@@ -328,15 +328,22 @@ func deleteCallback(scope *gorm.Scope) {
 func updateVersionPriority(scope *gorm.Scope) {
 	if field, ok := scope.FieldByName("VersionPriority"); ok {
 		var scheduledTime *time.Time
+		var versionName string
+
 		if scheduled, ok := scope.Value.(ScheduledInterface); ok {
 			scheduledTime = scheduled.GetScheduledStartAt()
 		}
+
 		if scheduledTime == nil {
 			unix := time.Unix(0, 0)
 			scheduledTime = &unix
 		}
 
-		priority := fmt.Sprintf("%v_%v_%v", scope.PrimaryKeyValue(), scheduledTime.UTC().Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339Nano))
+		if versionable, ok := scope.Value.(VersionableInterface); ok {
+			versionName = versionable.GetVersionName()
+		}
+
+		priority := fmt.Sprintf("%v_%v_%v", scope.PrimaryKeyValue(), scheduledTime.UTC().Format(time.RFC3339), versionName)
 		field.Set(priority)
 	}
 }
