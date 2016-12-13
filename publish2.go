@@ -69,15 +69,6 @@ func enablePublishMode(res resource.Resourcer) {
 					Type: "hidden",
 				})
 
-				res.Meta(&admin.Meta{
-					Name:  "Versions",
-					Label: "Versions",
-					Type:  "publish_versions",
-					Valuer: func(interface{}, *qor.Context) interface{} {
-						return ""
-					},
-				})
-
 				res.Action(&admin.Action{
 					Name:        "Create New Version",
 					Method:      "GET",
@@ -99,9 +90,23 @@ func enablePublishMode(res resource.Resourcer) {
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
 
-				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionPriority")
-				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
-				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
+				res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
+				res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
+				res.NewAttrs(res.NewAttrs(), "-VersionPriority", "VersionName")
+			}
+
+			if IsPublishReadyableModel(res.Value) || IsSchedulableModel(res.Value) || IsVersionableModel(res.Value) {
+				res.Meta(&admin.Meta{
+					Name: "LiveNow",
+					Type: "publish_live_now",
+					Valuer: func(interface{}, *qor.Context) interface{} {
+						return ""
+					},
+				})
+
+				res.IndexAttrs(res.IndexAttrs(), "LiveNow")
+				res.EditAttrs(res.EditAttrs(), "-LiveNow")
+				res.NewAttrs(res.NewAttrs(), "-LiveNow")
 			}
 
 			if IsShareableVersionModel(res.Value) {
