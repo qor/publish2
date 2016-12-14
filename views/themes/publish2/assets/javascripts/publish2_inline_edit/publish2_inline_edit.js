@@ -72,31 +72,30 @@
                 publishReady = this.getUrlParameter('publish_ready'),
                 $trigger = this.$trigger,
                 $selectorLabel = $trigger.find('.qor-selector-label'),
-                $publishReadyLabel = $trigger.find('.qor-publishready-label');
+                $publishReadyLabel = $trigger.find('.qor-publishready-label'),
+                $publishreadyInput = $('#qor-publishready__on');
 
 
-            if (!(scheduleTime || publishReady)) {
-                return;
-            }
-
-            if (publishReady === 'true') {
-                $publishReadyLabel.html(this.publishReadyOn);
-                $publishReadyLabel.before('<i class="material-icons qor-selector-clear" data-type="publishready">clear</i>')
-                $('#qor-publishready__on').prop('checked', true);
+            if (publishReady == '') {
+                $('[name="QorResource.PublishReady"]').prop('checked', false);
             } else {
-                $publishReadyLabel.html(this.publishReadyOff);
-                $('#qor-publishready__on').prop('checked', false);
-                $publishReadyLabel.next('i').remove();
+                $publishReadyLabel.parent().show();
+                if (publishReady === 'true') {
+                    $publishreadyInput.prop('checked', true);
+                    $publishReadyLabel.html(this.publishReadyOn);
+                } else {
+                    $publishreadyInput.prop('checked', false);
+                    $publishReadyLabel.html(this.publishReadyOff);
+                }
+                $publishReadyLabel.before('<i class="material-icons qor-selector-clear" data-type="publishready">clear</i>');
             }
 
-            if (scheduleTime) {
+            if (scheduleTime != '') {
                 this.$scheduleTime.val(scheduleTime);
+                $selectorLabel.parent().show();
                 $selectorLabel.html(scheduleTime);
                 $selectorLabel.before('<i class="material-icons qor-selector-clear">clear</i>');
             }
-
-
-
         },
 
         show: function() {
@@ -124,10 +123,10 @@
                 $publishReadyLabel = $trigger.find('.qor-publishready-label');
 
             if ($element.data().type) {
-                $publishReadyLabel.html(this.publishReadyOff);
-                $('#qor-publishready__on').prop('checked', false);
+                $publishReadyLabel.html('').parent().hide();
+                $('[name="QorResource.PublishReady"]').prop('checked', false);
             } else {
-                $label.html($label.data('label'));
+                $label.parent().hide();
                 this.$scheduleTime.val('');
             }
 
@@ -170,15 +169,19 @@
             $searchParam.each(function() {
                 var $this = $(this),
                     searchParam = $this.data().searchParam,
+                    hasCheckedLabel = $this.find('[name="QorResource.PublishReady"]').filter(':checked').size(),
                     val = $this.val();
                 if (searchParam == 'publish_ready') {
-                    val = !!Number($this.find('input:checked').val());
+                    if (hasCheckedLabel) {
+                        val = !!Number($this.find('input:checked').val());
+                    } else {
+                        val = '';
+                    }
                 }
 
                 uri = _this.updateQueryStringParameter(searchParam, val, uri);
             });
-
-            location.href = uri;
+            window.location.href = uri;
         },
 
         destroy: function() {
