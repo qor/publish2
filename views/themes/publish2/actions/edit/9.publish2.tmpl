@@ -22,7 +22,7 @@
 
           <div class="qor-field__edit">
             {{if $creating_new_version }}
-              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="v{{get_versions_count $result $context}}">
+              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{get_new_version_name $result $context}}">
             {{else}}
               {{$versionName := (render_meta $result $versionMeta)}}
               {{if (eq get_default_version_name $versionName)}}

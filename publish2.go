@@ -171,7 +171,7 @@ func enablePublishMode(res resource.Resourcer) {
 				return context.Admin.GetResource("ScheduledEvent")
 			})
 
-			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
+			getVersionsCount := func(record interface{}, context *admin.Context) interface{} {
 				var (
 					count        int
 					db           = context.GetDB().Set(VersionNameMode, "").Set(VersionMode, VersionMultipleMode)
@@ -180,6 +180,14 @@ func enablePublishMode(res resource.Resourcer) {
 				)
 				db.Set(admin.DisableCompositePrimaryKeyMode, "on").Model(context.Resource.NewStruct()).Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).Count(&count)
 				return count
+			}
+
+			res.GetAdmin().RegisterFuncMap("get_new_version_name", func(record interface{}, context *admin.Context) interface{} {
+				return fmt.Sprintf("v%v", getVersionsCount(record, context))
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
+				return getVersionsCount(record, context)
 			})
 		}
 	}
