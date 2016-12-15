@@ -195,7 +195,8 @@ func queryCallback(scope *gorm.Scope) {
 			}
 		}
 
-		scope.Search.Order(fmt.Sprintf("%v.version_priority DESC", scope.QuotedTableName()))
+		quotedTableName := scope.QuotedTableName()
+		scope.Search.Order(fmt.Sprintf("%v.%v, %v.version_priority DESC", quotedTableName, scope.Quote(scope.PrimaryKey()), quotedTableName))
 	} else {
 		if isShareableVersion {
 			var versionName string
@@ -343,7 +344,7 @@ func updateVersionPriority(scope *gorm.Scope) {
 			versionName = versionable.GetVersionName()
 		}
 
-		priority := fmt.Sprintf("%v_%v_%v", scope.PrimaryKeyValue(), scheduledTime.UTC().Format(time.RFC3339), versionName)
+		priority := fmt.Sprintf("%v_%v", scheduledTime.UTC().Format(time.RFC3339), versionName)
 		field.Set(priority)
 	}
 }
