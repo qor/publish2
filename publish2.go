@@ -44,11 +44,13 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsSchedulableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name:  "ScheduledEventID",
-					Label: "Scheduled Event",
-					Type:  "hidden",
-				})
+				if res.GetMeta("ScheduledEventID") == nil {
+					res.Meta(&admin.Meta{
+						Name:  "ScheduledEventID",
+						Label: "Scheduled Event",
+						Type:  "hidden",
+					})
+				}
 
 				res.IndexAttrs(res.IndexAttrs(), "-ScheduledEventID")
 				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
@@ -60,15 +62,19 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsVersionableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "VersionPriority",
-					Type: "hidden",
-				})
+				if res.GetMeta("VersionPriority") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionPriority",
+						Type: "hidden",
+					})
+				}
 
-				res.Meta(&admin.Meta{
-					Name: "VersionName",
-					Type: "hidden",
-				})
+				if res.GetMeta("VersionName") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionName",
+						Type: "hidden",
+					})
+				}
 
 				res.Action(&admin.Action{
 					Name:        "Create New Version",
@@ -97,51 +103,58 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsPublishReadyableModel(res.Value) || IsSchedulableModel(res.Value) || IsVersionableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "LiveNow",
-					Type: "publish_live_now",
-					Valuer: func(interface{}, *qor.Context) interface{} {
-						return ""
-					},
-				})
+				if res.GetMeta("PublishLiveNow") == nil {
+					res.Meta(&admin.Meta{
+						Name:  "PublishLiveNow",
+						Label: "Live Now",
+						Type:  "publish_live_now",
+						Valuer: func(interface{}, *qor.Context) interface{} {
+							return ""
+						},
+					})
+				}
 
-				res.IndexAttrs(res.IndexAttrs(), "LiveNow")
-				res.EditAttrs(res.EditAttrs(), "-LiveNow")
-				res.NewAttrs(res.NewAttrs(), "-LiveNow")
+				res.IndexAttrs(res.IndexAttrs(), "PublishLiveNow")
+				res.EditAttrs(res.EditAttrs(), "-PublishLiveNow")
+				res.NewAttrs(res.NewAttrs(), "-PublishLiveNow")
 			}
 
 			if IsShareableVersionModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "VersionName",
-					Type: "hidden",
-					Valuer: func(record interface{}, context *qor.Context) interface{} {
-						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-							return shareableVersion.GetSharedVersionName()
-						}
-						return ""
-					},
-					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					},
-				})
-
-				res.Meta(&admin.Meta{
-					Name: "ShareableVersion",
-					Type: "string",
-					Valuer: func(record interface{}, context *qor.Context) interface{} {
-						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-							return shareableVersion.GetSharedVersionName() != ""
-						}
-						return false
-					},
-					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-						if utils.ToString(metaValue.Value) == "true" {
+				if res.GetMeta("VersionName") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionName",
+						Type: "hidden",
+						Valuer: func(record interface{}, context *qor.Context) interface{} {
 							if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-								versionName := context.Request.Form.Get("QorResource.VersionName")
-								shareableVersion.SetSharedVersionName(versionName)
+								return shareableVersion.GetSharedVersionName()
 							}
-						}
-					},
-				})
+							return ""
+						},
+						Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+						},
+					})
+				}
+
+				if res.GetMeta("ShareableVersion") == nil {
+					res.Meta(&admin.Meta{
+						Name: "ShareableVersion",
+						Type: "string",
+						Valuer: func(record interface{}, context *qor.Context) interface{} {
+							if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+								return shareableVersion.GetSharedVersionName() != ""
+							}
+							return false
+						},
+						Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+							if utils.ToString(metaValue.Value) == "true" {
+								if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+									versionName := context.Request.Form.Get("QorResource.VersionName")
+									shareableVersion.SetSharedVersionName(versionName)
+								}
+							}
+						},
+					})
+				}
 			}
 
 			res.GetAdmin().RegisterFuncMap("get_schedule_event", func(record interface{}, context *admin.Context) interface{} {
