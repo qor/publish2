@@ -23,10 +23,9 @@
 
   <div class="qor-filter__block qor-filter__dropdown clearfix" style="display: none;">
 
-    <div class="qor-field__edit qor-field__publishready" data-search-param="publish_ready">
+    <div class="qor-field__edit qor-field__publishready" data-search-param="publish_draft_content">
       {{$requestingDraftContent := (get_requesting_publish_draft_content .)}}
-      <label><input type="radio" name="QorResource.PublishReady" id="qor-publishready__off" value="{{$requestingDraftContent}}" data-label="{{t "qor_publish.schedule.preview.all" "All"}}" /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
-      <label><input type="radio" name="QorResource.PublishReady" id="qor-publishready__on" value="{{not $requestingDraftContent}}" data-label="{{t "qor_publish.schedule.preview.publish_ready" "Publish Ready"}}" /> {{t "qor_publish.schedule.preview.publish_ready" "Publish Ready"}}</label>
+      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}CHECKED{{end}} data-label="{{t "qor_publish.schedule.preview.all" "All"}}" /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
     </div>
 
     <div class="qor-field__edit qor-field__datetimepicker">
