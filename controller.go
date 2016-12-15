@@ -6,6 +6,7 @@ import (
 
 	"github.com/qor/admin"
 	"github.com/qor/qor"
+	"github.com/qor/roles"
 )
 
 type controller struct {
@@ -65,7 +66,7 @@ func (ctr controller) Versions(context *admin.Context) {
 	result := context.Funcs(template.FuncMap{
 		"version_metas": func() (metas []*admin.Meta) {
 			for _, name := range []string{"VersionName", "ScheduledStartAt", "ScheduledEndAt", "PublishReady", "LiveNow"} {
-				if meta := ctr.Resource.GetMeta(name); meta != nil {
+				if meta := ctr.Resource.GetMeta(name); meta != nil && meta.HasPermission(roles.Read, context.Context) {
 					metas = append(metas, meta)
 				}
 			}
