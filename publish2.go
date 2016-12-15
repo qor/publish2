@@ -187,6 +187,14 @@ func enablePublishMode(res resource.Resourcer) {
 				return fmt.Sprintf("v%v", getVersionsCount(record, context))
 			})
 
+			res.GetAdmin().RegisterFuncMap("get_publish_schedule_time", func(context *admin.Context) interface{} {
+				return getPublishScheduleTime(context.Context)
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_requesting_publish_draft_content", func(context *admin.Context) interface{} {
+				return requestingPublishDraftContent(context.Context)
+			})
+
 			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
 				return getVersionsCount(record, context)
 			})
