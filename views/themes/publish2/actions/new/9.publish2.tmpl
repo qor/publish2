@@ -5,7 +5,7 @@
 {{$scheduleEvent := (get_schedule_event $result .)}}
 
 <div class="qor-form-container qor-pulish2__action">
-  <div class="qor-form-section-rows qor-section-columns-2 clearfix">
+  <div class="qor-form-section-rows qor-section-columns-2 clearfix qor-publish2__action_publish_ready">
     {{$publishReadyMeta := $resource.GetMeta "PublishReady"}}
     {{if $publishReadyMeta}}
       <div class="qor-field">
@@ -30,7 +30,7 @@
 
   {{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
     {{if $scheduledStartAtMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_scheduled_start_at">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{meta_label $scheduledStartAtMeta}}
@@ -55,7 +55,7 @@
 
     {{$scheduledEndAtMeta := $resource.GetMeta "ScheduledEndAt"}}
     {{if $scheduledEndAtMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_scheduled_end_at">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{meta_label $scheduledEndAtMeta}}
@@ -76,12 +76,10 @@
       </div>
       </div>
     {{end}}
-
   </div>
 
-
   {{if $scheduleEventIDMeta}}
-    <div class="qor-form-section-rows qor-section-columns-2 clearfix">
+    <div class="qor-form-section-rows qor-section-columns-2 clearfix qor-publish2__action_scheduled_event">
       <div class="qor-field">
         <label class="qor-field__label">
           {{meta_label $scheduleEventIDMeta}}
