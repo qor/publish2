@@ -7,10 +7,10 @@
 {{$scheduleEvent := (get_schedule_event $result .)}}
 
 <div class="qor-form-container qor-pulish2__action">
-  <div class="qor-form-section-rows qor-section-columns-2 clearfix qor-publish2__action_version_name">
+  <div class="qor-form-section-rows qor-section-columns-2 clearfix">
     {{$versionMeta := $resource.GetMeta "VersionName"}}
     {{if $versionMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_version_name">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{if $creating_new_version}}
