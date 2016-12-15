@@ -16,7 +16,12 @@
       </span>
 
       <span class="qor-actions__filter-item" style="display: none;">
-        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}"></span>
+        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}">
+          {{if get_publish_schedule_time .}}
+            {{get_publish_schedule_time .}}
+            <i class="material-icons qor-selector-clear">clear</i>
+          {{end}}
+        </span>
       </span>
     </a>
   </div>
@@ -25,7 +30,7 @@
 
     <div class="qor-field__edit qor-field__publishready" data-search-param="publish_draft_content">
       {{$requestingDraftContent := (get_requesting_publish_draft_content .)}}
-      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}CHECKED{{end}} data-label="{{t "qor_publish.schedule.preview.all" "All"}}" /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
+      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all" "All"}}" /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
     </div>
 
     <div class="qor-field__edit qor-field__datetimepicker">
