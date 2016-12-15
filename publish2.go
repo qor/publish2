@@ -3,6 +3,7 @@ package publish2
 import (
 	"fmt"
 	"path"
+	"reflect"
 	"regexp"
 
 	"github.com/qor/admin"
@@ -188,6 +189,22 @@ func enablePublishMode(res resource.Resourcer) {
 
 			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
 				return getVersionsCount(record, context)
+			})
+
+			res.GetAdmin().RegisterFuncMap("current_live_version", func(record interface{}, context *admin.Context) interface{} {
+				var (
+					db           = context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(ScheduleMode, "on").Set(VersionMode, "on").Set(VisibleMode, "on").Set(VersionNameMode, "").Set(ScheduledTime, "").Set(ScheduledStart, "").Set(ScheduledEnd, "")
+					scope        = db.NewScope(record)
+					primaryField = scope.PrimaryField()
+					newrecord    = reflect.New(utils.ModelType(record)).Interface()
+				)
+
+				db.First(newrecord, fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface())
+
+				if versionable, ok := newrecord.(VersionableInterface); ok {
+					return versionable.GetVersionName()
+				}
+				return ""
 			})
 		}
 	}
