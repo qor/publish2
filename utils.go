@@ -33,10 +33,10 @@ func requestingPublishDraftContent(context *qor.Context) bool {
 
 func PreviewByDB(tx *gorm.DB, context *qor.Context) *gorm.DB {
 	scheduledTime := getPublishScheduleTime(context)
-	publishDraft := requestingPublishDraftContent(context)
+	draftContent := requestingPublishDraftContent(context)
 
 	utils.SetCookie(http.Cookie{Name: "publish2_publish_scheduled_time", Value: scheduledTime}, context)
-	utils.SetCookie(http.Cookie{Name: "pubilsh2_publish_ready", Value: fmt.Sprint(publishDraft)}, context)
+	utils.SetCookie(http.Cookie{Name: "pubilsh2_publish_draft_content", Value: fmt.Sprint(draftContent)}, context)
 
 	if scheduledTime != "" {
 		if t, err := utils.ParseTime(scheduledTime, context); err == nil {
@@ -44,7 +44,7 @@ func PreviewByDB(tx *gorm.DB, context *qor.Context) *gorm.DB {
 		}
 	}
 
-	if publishDraft {
+	if draftContent {
 		tx = tx.Set(VisibleMode, ModeOff)
 	}
 
