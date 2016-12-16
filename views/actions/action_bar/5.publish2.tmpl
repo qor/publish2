@@ -31,7 +31,11 @@
   <div class="qor-filter__block qor-filter__dropdown clearfix" style="display: none;">
 
     <div class="qor-field__edit qor-field__publishready" data-search-param="publish_draft_content">
-      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all_content" "All Content"}}" /> {{t "qor_publish.schedule.preview.all_content" "All Content"}}</label>
+      <label>
+        <input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all_content" "All Content"}}" /> 
+        {{t "qor_publish.schedule.preview.all_content" "All Content"}}
+      </label>
+      <span>{{t "qor_publish.schedule.preview.all_content.hint.Publish-ready_content_is_shown_by_default" "Publish-ready content is shown by default"}}</span>
     </div>
 
     <div class="qor-field__edit qor-field__datetimepicker">
