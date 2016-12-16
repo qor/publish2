@@ -24,7 +24,6 @@
     var CLASS_FILTER_SELECTOR = '.qor-filter__dropdown';
     var CLASS_FILTER_TOGGLE = '.qor-filter-toggle';
     var VALUE_DRAFT_CONTENT = 'publish_draft_content';
-    var VALUE_SCHEDULED_TIME = 'publish_scheduled_time';
     var CLASS_QORRESOURCE_PUBLISHREADY = '[name="QorResource.PublishReady"]';
 
     function QorFilterTime(element, options) {
@@ -43,11 +42,7 @@
             this.$scheduleTime = $element.find(CLASS_SCHEDULED_TIME);
             this.$searchButton = $element.find(this.options.button);
             this.$trigger = $element.find(this.options.trigger);
-
             this.publishReadyOff = $('#qor-publishready__off').data().label;
-
-            this.initActionTemplate();
-
         },
 
         bind: function() {
@@ -67,31 +62,6 @@
             off(EVENT_CLICK, options.trigger, this.show.bind(this)).
             off(EVENT_CLICK, options.clear, this.clear.bind(this)).
             off(EVENT_CLICK, options.button, this.search.bind(this));
-        },
-
-        initActionTemplate: function() {
-            var scheduleTime = this.getUrlParameter(VALUE_SCHEDULED_TIME),
-                publishReady = this.getUrlParameter(VALUE_DRAFT_CONTENT),
-                $trigger = this.$trigger,
-                $selectorLabel = $trigger.find('.qor-selector-label'),
-                $publishReadyLabel = $trigger.find('.qor-publishready-label'),
-                $publishreadyInput = $('#qor-publishready__off');
-
-
-            if (publishReady == '') {
-                $(CLASS_QORRESOURCE_PUBLISHREADY).prop('checked', false);
-            } else if (publishReady === 'true') {
-                $publishreadyInput.prop('checked', true);
-                $publishReadyLabel.html(this.publishReadyOff).parent().show();
-                $publishReadyLabel.before('<i class="material-icons qor-selector-clear" data-type="publishready">clear</i>');
-            }
-
-            if (scheduleTime != '') {
-                this.$scheduleTime.val(scheduleTime);
-                $selectorLabel.parent().show();
-                $selectorLabel.html(scheduleTime);
-                $selectorLabel.before('<i class="material-icons qor-selector-clear">clear</i>');
-            }
         },
 
         show: function() {
