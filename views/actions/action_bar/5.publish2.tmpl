@@ -5,23 +5,25 @@
   <link type="text/css" rel="stylesheet" href="{{ .RouterPrefix }}/assets/stylesheets/publish2_inline_edit.css?theme=publish2" />
 {{end}}
 
+{{$requestingDraftContent := (get_requesting_publish_draft_content .)}}
+{{$publish_schedule_time := get_publish_schedule_time .}}
 <div class="qor-actions qor-actions__filter-time" data-toggle="qor.filter.time">
   <div class="qor-selector left-aligned">
     <a href="javascript://" class="qor-selector-toggle qor-filter-toggle">
       <span>{{t "qor_publish.schedule.title.preview_by" "PREVIEW BY"}}</span>
-      <span class=" qor-actions__filter-item" style="display: none;">
+      
+      <span class=" qor-actions__filter-item" {{if not $requestingDraftContent}}style="display: none;"{{end}}>
+        <i class="material-icons qor-selector-clear" data-type="publishready">clear</i>
         <span class="qor-publishready-label">
-          {{t "qor_publish.schedule.preview.all_content" "All Content"}}
+          {{if $requestingDraftContent}}
+            {{t "qor_publish.schedule.preview.all_content" "All Content"}}
+          {{end}}
         </span>
       </span>
 
-      <span class="qor-actions__filter-item" style="display: none;">
-        <span class="qor-selector-label" data-label="{{t "qor_publish.schedule.publish_scheduled_time" "Publish Scheduled Time"}}">
-          {{if get_publish_schedule_time .}}
-            {{get_publish_schedule_time .}}
-            <i class="material-icons qor-selector-clear">clear</i>
-          {{end}}
-        </span>
+      <span class="qor-actions__filter-item" {{if not $publish_schedule_time}}style="display: none;"{{end}}>
+        <i class="material-icons qor-selector-clear">clear</i>
+        <span class="qor-selector-label">{{get_publish_schedule_time .}}</span>
       </span>
     </a>
   </div>
@@ -29,7 +31,6 @@
   <div class="qor-filter__block qor-filter__dropdown clearfix" style="display: none;">
 
     <div class="qor-field__edit qor-field__publishready" data-search-param="publish_draft_content">
-      {{$requestingDraftContent := (get_requesting_publish_draft_content .)}}
       <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all_content" "All Content"}}" /> {{t "qor_publish.schedule.preview.all_content" "All Content"}}</label>
     </div>
 
