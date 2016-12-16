@@ -65,7 +65,7 @@ func (ctr controller) Versions(context *admin.Context) {
 
 	result := context.Funcs(template.FuncMap{
 		"version_metas": func() (metas []*admin.Meta) {
-			for _, name := range []string{"VersionName", "ScheduledStartAt", "ScheduledEndAt", "PublishReady", "LiveNow"} {
+			for _, name := range []string{"VersionName", "ScheduledStartAt", "ScheduledEndAt", "PublishReady", "PublishLiveNow"} {
 				if meta := ctr.Resource.GetMeta(name); meta != nil && meta.HasPermission(roles.Read, context.Context) {
 					metas = append(metas, meta)
 				}
