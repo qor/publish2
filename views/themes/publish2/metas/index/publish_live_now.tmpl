@@ -1,17 +1,24 @@
 {{$current_version := .ResourceValue.GetVersionName}}
 {{$current_live_version := (current_live_version .ResourceValue .Context)}}
 {{if $current_live_version}}
-  {{if eq $current_version $current_live_version}}
-    current version is live
-  {{else}}
-    another version is live
-  {{end}}
+  <span class="qor-publish2__live">
+    {{if eq $current_version $current_live_version}}
+      <span class="qor-symbol qor-symbol-blue"></span>
+    {{else}}
+      <span class="qor-symbol qor-symbol-yellow"></span>
+    {{end}}
+  </span>
 {{end}}
 
 {{if (gt (get_versions_count .ResourceValue .Context) 1)}}
-  <a href="{{join_url (url_for .ResourceValue) "versions"}}" class="qor-publish2__version" data-version-url="{{join_url (url_for .ResourceValue) "versions"}}">
-    <i class="material-icons">update</i>
-  </a>
+  <span class="qor-publish2__button">
+    <a href="{{join_url (url_for .ResourceValue) "versions"}}" class="qor-publish2__version" title="{{t "qor_admin.publish.button.versions" "VERSIONS"}}" data-version-url="{{join_url (url_for .ResourceValue) "versions"}}">
+      <span>{{t "qor_admin.publish.button.versions" "VERSIONS"}}</span>
+      <i class="material-icons">update</i>
+    </a>
+  </span>
 {{else}}
-  <i class="material-icons"></i>
+  <span class="qor-publish2__button">
+    <i class="material-icons"></i>
+  </span>
 {{end}}

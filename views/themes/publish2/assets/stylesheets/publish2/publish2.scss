@@ -17,7 +17,81 @@ tr.is-showing {
     }
 }
 
+.qor-publish2__version {
+    text-decoration: none;
+}
+
+.qor-publish2__button {
+    a>span {
+        display: none;
+    }
+}
+
+.qor-publish2__live {
+    .qor-symbol {
+        display: inline-block;
+        vertical-align: middle;
+        width: 12px;
+        height: 12px;
+        border-radius: 100%;
+        &.qor-symbol-blue {
+            background-color: #03a9f4;
+        }
+        &.qor-symbol-yellow {
+            background-color: #f4b903;
+        }
+    }
+}
+
+.qor-table {
+    .material-icons {
+        vertical-align: middle;
+        margin-left: 12px;
+        &:empty {
+            display: none;
+        }
+    }
+}
+
 .qor-table--medialibrary {
+    .qor-publish2__button {
+        a {
+            display: block;
+            height: 24px;
+            line-height: 24px;
+            padding-top: 10px;
+            padding-left: 16px;
+            margin: 6px -16px -8px -16px;
+            border-top: 1px solid rgba(0, 0, 0, .12);
+            i {
+                display: none;
+            }
+            >span {
+                display: block;
+            }
+        }
+    }
+    .qor-publish2__live {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        .qor-symbol {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 28px 28px 0 0;
+            border-radius: 0;
+            &.qor-symbol-blue {
+                background: none;
+                border-color: #03a9f4 transparent transparent transparent;
+            }
+            &.qor-symbol-yellow {
+                background: none;
+                border-color: #f4b903 transparent transparent transparent;
+            }
+        }
+    }
     tr.is-showing {
         border: 0;
         .qor-table--medialibrary-item {
@@ -34,13 +108,6 @@ tr.is-showing {
         .qor-table__inner-block {
             padding: 0 0 24px 0;
         }
-    }
-}
-
-.qor-publish2__version {
-    text-decoration: none;
-    i {
-        color: rgba(0, 0, 0, .87);
     }
 }
 
