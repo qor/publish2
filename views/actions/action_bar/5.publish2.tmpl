@@ -11,7 +11,7 @@
       <span>{{t "qor_publish.schedule.title.preview_by" "PREVIEW BY"}}</span>
       <span class=" qor-actions__filter-item" style="display: none;">
         <span class="qor-publishready-label">
-          {{t "qor_publish.schedule.preview.all" "All"}}
+          {{t "qor_publish.schedule.preview.all_content" "All Content"}}
         </span>
       </span>
 
@@ -30,7 +30,7 @@
 
     <div class="qor-field__edit qor-field__publishready" data-search-param="publish_draft_content">
       {{$requestingDraftContent := (get_requesting_publish_draft_content .)}}
-      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all" "All"}}" /> {{t "qor_publish.schedule.preview.all" "All"}}</label>
+      <label><input type="checkbox" name="QorResource.PublishReady" id="qor-publishready__off" {{if $requestingDraftContent}}checked{{end}} data-label="{{t "qor_publish.schedule.preview.all_content" "All Content"}}" /> {{t "qor_publish.schedule.preview.all_content" "All Content"}}</label>
     </div>
 
     <div class="qor-field__edit qor-field__datetimepicker">
