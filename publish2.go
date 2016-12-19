@@ -304,9 +304,11 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 					}
 				}
 
-				for key, value := range context.Request.URL.Query() {
+				for key, values := range context.Request.URL.Query() {
 					if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
-						tx = tx.Set(VersionNameMode, value)
+						if len(values) > 0 {
+							tx = tx.Set(VersionNameMode, values[0])
+						}
 					}
 				}
 
