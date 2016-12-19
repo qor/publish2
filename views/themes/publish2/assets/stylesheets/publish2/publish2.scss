@@ -28,6 +28,7 @@ tr.is-showing {
 }
 
 .qor-publish2__live {
+    margin-right: 36px;
     .qor-symbol {
         display: inline-block;
         vertical-align: middle;
@@ -46,7 +47,6 @@ tr.is-showing {
 .qor-table {
     .material-icons {
         vertical-align: middle;
-        margin-left: 12px;
         &:empty {
             display: none;
         }
