@@ -3,22 +3,20 @@
 {{if $current_live_version}}
   <span class="qor-publish2__live">
     {{if eq $current_version $current_live_version}}
-      <span class="qor-symbol qor-symbol-blue"></span>
+      <span class="qor-symbol qor-symbol-blue" title="{{t "qor_admin.publish.hint.this_version_is_live" "This version is live"}}"></span>
     {{else}}
-      <span class="qor-symbol qor-symbol-yellow"></span>
+      <span class="qor-symbol qor-symbol-yellow" title="{{t "qor_admin.publish.hint.view_all_versions_to_see_which_is_live" "View all versions to see which is live"}}"></span>
     {{end}}
   </span>
 {{end}}
 
-{{if (gt (get_versions_count .ResourceValue .Context) 1)}}
+
   <span class="qor-publish2__button">
-    <a href="{{join_url (url_for .ResourceValue) "versions"}}" class="qor-publish2__version" title="{{t "qor_admin.publish.button.versions" "VERSIONS"}}" data-version-url="{{join_url (url_for .ResourceValue) "versions"}}">
-      <span>{{t "qor_admin.publish.button.versions" "VERSIONS"}}</span>
-      <i class="material-icons">update</i>
-    </a>
+    {{if (gt (get_versions_count .ResourceValue .Context) 1)}}
+      <a href="{{join_url (url_for .ResourceValue) "versions"}}" class="qor-publish2__version" title="{{t "qor_admin.publish.button.versions" "VERSIONS"}}" data-version-url="{{join_url (url_for .ResourceValue) "versions"}}">
+        <span>{{t "qor_admin.publish.button.versions" "VERSIONS"}}</span>
+        <i class="material-icons">update</i>
+      </a>
+    {{end}}
   </span>
-{{else}}
-  <span class="qor-publish2__button">
-    <i class="material-icons"></i>
-  </span>
-{{end}}
+
