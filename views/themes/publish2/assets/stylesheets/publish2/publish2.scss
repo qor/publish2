@@ -22,8 +22,6 @@ tr.is-showing {
 }
 
 .qor-publish2__button {
-    height: 35px;
-    display: block;
     a>span {
         display: none;
     }
@@ -57,6 +55,8 @@ tr.is-showing {
 
 .qor-table--medialibrary {
     .qor-publish2__button {
+        height: 35px;
+        display: block;
         a {
             display: block;
             height: 24px;
