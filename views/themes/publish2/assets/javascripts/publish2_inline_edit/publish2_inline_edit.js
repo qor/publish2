@@ -74,9 +74,10 @@
                 filterVisible = $filter.is(':visible'),
                 isInFilter = $target.closest(CLASS_FILTER_SELECTOR).size(),
                 isInToggle = $target.closest(CLASS_FILTER_TOGGLE).size(),
-                isInModal = $target.closest('.qor-modal').size();
+                isInModal = $target.closest('.qor-modal').size(),
+                isInTimePicker = $target.closest('.ui-timepicker-wrapper').size();
 
-            if (filterVisible && (isInFilter || isInToggle || isInModal)) {
+            if (filterVisible && (isInFilter || isInToggle || isInModal || isInTimePicker)) {
                 return;
             }
             $filter.hide();
