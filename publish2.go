@@ -212,7 +212,7 @@ func enablePublishMode(res resource.Resourcer) {
 				return getVersionsCount(record, context)
 			})
 
-			res.GetAdmin().RegisterFuncMap("current_live_version", func(record interface{}, context *admin.Context) interface{} {
+			res.GetAdmin().RegisterFuncMap("get_live_status", func(record interface{}, context *admin.Context) interface{} {
 				var (
 					db           = context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(ScheduleMode, "on").Set(VersionMode, "on").Set(VisibleMode, "on").Set(VersionNameMode, "").Set(ScheduledTime, "").Set(ScheduledStart, "").Set(ScheduledEnd, "")
 					scope        = db.NewScope(record)
@@ -220,11 +220,18 @@ func enablePublishMode(res resource.Resourcer) {
 					newrecord    = reflect.New(utils.ModelType(record)).Interface()
 				)
 
-				db.First(newrecord, fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface())
-
-				if versionable, ok := newrecord.(VersionableInterface); ok {
-					return versionable.GetVersionName()
+				if !db.First(newrecord, fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).RecordNotFound() {
+					if oldVersion, ok := record.(VersionableInterface); ok {
+						if versionable, ok := newrecord.(VersionableInterface); ok {
+							if oldVersion.GetVersionName() == versionable.GetVersionName() {
+								return "live"
+							}
+							return "available"
+						}
+					}
+					return "live"
 				}
+
 				return ""
 			})
 		}
