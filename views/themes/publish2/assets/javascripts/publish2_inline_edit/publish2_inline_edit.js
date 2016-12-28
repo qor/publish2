@@ -72,10 +72,10 @@
             var $target = $(e.target),
                 $filter = $(CLASS_FILTER_SELECTOR),
                 filterVisible = $filter.is(':visible'),
-                isInFilter = $target.closest(CLASS_FILTER_SELECTOR).size(),
-                isInToggle = $target.closest(CLASS_FILTER_TOGGLE).size(),
-                isInModal = $target.closest('.qor-modal').size(),
-                isInTimePicker = $target.closest('.ui-timepicker-wrapper').size();
+                isInFilter = $target.closest(CLASS_FILTER_SELECTOR).length,
+                isInToggle = $target.closest(CLASS_FILTER_TOGGLE).length,
+                isInModal = $target.closest('.qor-modal').length,
+                isInTimePicker = $target.closest('.ui-timepicker-wrapper').length;
 
             if (filterVisible && (isInFilter || isInToggle || isInModal || isInTimePicker)) {
                 return;
@@ -129,7 +129,7 @@
                 uri,
                 _this = this;
 
-            if (!$searchParam.size()) {
+            if (!$searchParam.length) {
                 return;
             }
 
