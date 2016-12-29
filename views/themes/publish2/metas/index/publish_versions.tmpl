@@ -1,7 +1,0 @@
-{{if (gt (get_versions_count .ResourceValue .Context) 1)}}
-  <a href="{{join_url (url_for .ResourceValue) "versions"}}" class="qor-publish2__version" data-version-url="{{join_url (url_for .ResourceValue) "versions"}}">
-    <i class="material-icons">update</i>
-  </a>
-{{else}}
-  <i class="material-icons"></i>
-{{end}}

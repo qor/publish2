@@ -10,7 +10,7 @@
   <div class="qor-form-section-rows qor-section-columns-2 clearfix">
     {{$versionMeta := $resource.GetMeta "VersionName"}}
     {{if $versionMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_version_name">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{if $creating_new_version}}
@@ -22,13 +22,13 @@
 
           <div class="qor-field__edit">
             {{if $creating_new_version }}
-              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="v{{get_versions_count $result $context}}">
+              <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{get_new_version_name $result $context}}" {{if not (has_update_permission $versionMeta)}}disabled{{end}}>
             {{else}}
               {{$versionName := (render_meta $result $versionMeta)}}
               {{if (eq get_default_version_name $versionName)}}
                 {{$versionName}}
               {{else}}
-                <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{render_meta $result $versionMeta}}">
+                <input class="mdl-textfield__input qor-pulish2__action-input" data-action-type="versionname" type="text" value="{{render_meta $result $versionMeta}}" {{if not (has_update_permission $versionMeta)}}disabled{{end}}>
               {{end}}
             {{end}}
           </div>
@@ -38,7 +38,7 @@
 
     {{$publishReadyMeta := $resource.GetMeta "PublishReady"}}
     {{if $publishReadyMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_publish_ready">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{meta_label $publishReadyMeta}}
@@ -47,10 +47,10 @@
           <div class="qor-field__edit">
             <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
               {{if $creating_new_version}}
-                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready">
+                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if not (has_update_permission $publishReadyMeta)}}disabled{{end}}>
               {{else}}
                 {{$publishReadyValue := (raw_value_of $result $publishReadyMeta)}}
-                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}}>
+                <input type="checkbox" id="switch-1" class="mdl-switch__input qor-pulish2__action-input" data-action-type="publishready" {{if $publishReadyValue}}checked{{end}} {{if not (has_update_permission $publishReadyMeta)}}disabled{{end}}>
               {{end}}
               <span class="mdl-switch__label"></span>
             </label>
@@ -64,14 +64,14 @@
 
   {{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
     {{if $scheduledStartAtMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_scheduled_start_at">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{meta_label $scheduledStartAtMeta}}
           </label>
 
           <div class="qor-field__edit qor-field__datetimepicker">
-            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-start" data-action-type="scheduledstart" placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledStartAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{end}}>
+            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-start" data-start-date="true" data-action-type="scheduledstart" placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledStartAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledStartAtMeta)}}disabled{{end}}>
             <div class="qor-action__picker-button" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}style="display:none"{{end}}{{end}}>
               <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
                 <i class="material-icons">date_range</i>
@@ -89,14 +89,14 @@
 
     {{$scheduledEndAtMeta := $resource.GetMeta "ScheduledEndAt"}}
     {{if $scheduledEndAtMeta}}
-      <div class="qor-field">
+      <div class="qor-field qor-publish2__action_scheduled_end_at">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label" for="">
             {{meta_label $scheduledEndAtMeta}}
           </label>
 
             <div class="qor-field__edit qor-field__datetimepicker">
-              <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-end" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{end}}>
+              <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-end" data-start-date="true" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledEndAtMeta)}}disabled{{end}}>
               <div class="qor-action__picker-button" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}style="display:none"{{end}}{{end}}>
                 <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
                   <i class="material-icons">date_range</i>
@@ -115,14 +115,14 @@
 
 
   {{if $scheduleEventIDMeta}}
-    <div class="qor-form-section-rows qor-section-columns-2 clearfix">
+    <div class="qor-form-section-rows qor-section-columns-2 clearfix qor-publish2__action_scheduled_event">
       <div class="qor-field">
         <label class="qor-field__label">
           {{meta_label $scheduleEventIDMeta}}
         </label>
 
         <div class="qor-field__block qor-field__edit qor-field__selectone qor-pulish2__eventid" data-toggle="qor.selectone">
-          <input class="qor-pulish2__action-input qor-pulish2__eventid-input" type="hidden" data-action-type="eventid" />
+          <input class="qor-pulish2__action-input qor-pulish2__eventid-input" type="hidden" data-action-type="eventid" {{if not (has_update_permission $scheduleEventIDMeta)}}disabled{{end}}/>
 
           {{if $scheduleEvent.ID}}
             <p class="qor-field__selected" data-primary-key="{{$scheduleEvent.ID}}">
@@ -160,7 +160,7 @@
     <div class="qor-pulish2__action-sharedversion">
       <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="[[id]]">
         <input type="checkbox" id="[[id]]" class="mdl-switch__input" />
-        <span class="mdl-switch__label">{{marshal (t "qor_publish.schedule.only_change_values_for_this_version" "Change values for this version")}}</span>
+        <span class="mdl-switch__label">{{marshal (t "qor_publish.schedule.change_values_for_this_version_only" "Change values for this version only")}}</span>
       </label>
     </div>
   </script>

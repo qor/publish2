@@ -48,7 +48,7 @@
     var CLASS_PUBLISH_ACTION_END = '.qor-pulish2__action-end';
     var CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input';
     var CLASS_PICKER_BUTTON = '.qor-action__picker-button';
-    var CLASS_MEDIALIBRARY_TR = '.qor-table--medialibrary>tbody>tr';
+    var CLASS_MEDIALIBRARY_TR = '>tbody>tr';
 
     var IS_MEDIALIBRARY = 'qor-table--medialibrary';
     var IS_SHOW_VERSION = 'is-showing';
@@ -167,21 +167,25 @@
             }
 
             $(CLASS_VERSION_LIST).remove();
-            $table.find('tr').removeClass(IS_SHOW_VERSION);
+            $('table tr').removeClass(IS_SHOW_VERSION);
 
             $tr.addClass(IS_SHOW_VERSION);
 
             if (isMediaLibrary) {
-                var $trs = $(CLASS_MEDIALIBRARY_TR),
+                var $trs = $table.find(CLASS_MEDIALIBRARY_TR),
                     columnNum = parseInt($table.width() / 217),
                     currentNum = $trs.index($tr) + 1,
+                    rows = Math.ceil($trs.size() / columnNum),
                     currentRow = Math.ceil(currentNum / columnNum);
 
                 $tr = $($trs.get((columnNum * currentRow) - 1));
                 if (!$tr.size()) {
                     $tr = $trs.last();
                 }
-                $newRow = $('<tr class="' + VERSION_LIST + '" style="width: ' + (217 * columnNum - 16) + 'px"><td></td></tr>');
+                $newRow = $('<tr class="' + VERSION_LIST + '"><td></td></tr>');
+                if (rows > 1) {
+                    $newRow.width(217 * columnNum - 16);
+                }
             }
 
             $tr.after($newRow);
@@ -218,11 +222,17 @@
                 $field = $input.closest('.qor-fieldset'),
                 $template;
 
+
+            if ($field.hasClass('.qor-fieldset--new')) {
+                return;
+            }
+
             if ($element) {
                 $field.find(CLASS_PUBLISH_ACTION_SHAREDVERSION).remove();
             }
+
             randomString = (Math.random() + 1).toString(36).substring(7);
-            data.id = NAME_SHAREABLEVERSION + '_' + randomString;
+            data.id = [NAME_SHAREABLEVERSION, randomString].join('_');
             $template = $(window.Mustache.render(sharedVersion, data));
 
             $template.find('input').on(EVENT_CLICK, function() {
@@ -230,7 +240,7 @@
             });
 
             if ($input.val() == "true") {
-              $template.find('input').prop('checked', true);
+                $template.find('input').prop('checked', true);
             }
 
             $template.prependTo($field).trigger('enable');

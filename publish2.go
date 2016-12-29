@@ -3,6 +3,7 @@ package publish2
 import (
 	"fmt"
 	"path"
+	"reflect"
 	"regexp"
 
 	"github.com/qor/admin"
@@ -43,11 +44,13 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsSchedulableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name:  "ScheduledEventID",
-					Label: "Scheduled Event",
-					Type:  "hidden",
-				})
+				if res.GetMeta("ScheduledEventID") == nil {
+					res.Meta(&admin.Meta{
+						Name:  "ScheduledEventID",
+						Label: "Scheduled Event",
+						Type:  "hidden",
+					})
+				}
 
 				res.IndexAttrs(res.IndexAttrs(), "-ScheduledEventID")
 				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
@@ -59,24 +62,19 @@ func enablePublishMode(res resource.Resourcer) {
 			}
 
 			if IsVersionableModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "VersionPriority",
-					Type: "hidden",
-				})
+				if res.GetMeta("VersionPriority") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionPriority",
+						Type: "hidden",
+					})
+				}
 
-				res.Meta(&admin.Meta{
-					Name: "VersionName",
-					Type: "hidden",
-				})
-
-				res.Meta(&admin.Meta{
-					Name:  "Versions",
-					Label: "Versions",
-					Type:  "publish_versions",
-					Valuer: func(interface{}, *qor.Context) interface{} {
-						return ""
-					},
-				})
+				if res.GetMeta("VersionName") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionName",
+						Type: "hidden",
+					})
+				}
 
 				res.Action(&admin.Action{
 					Name:        "Create New Version",
@@ -99,43 +97,64 @@ func enablePublishMode(res resource.Resourcer) {
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
 
-				res.IndexAttrs(res.IndexAttrs(), "Versions", "-VersionPriority")
-				res.EditAttrs(res.EditAttrs(), "-Versions", "-VersionPriority", "VersionName")
-				res.NewAttrs(res.NewAttrs(), "-Versions", "-VersionPriority", "VersionName")
+				res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
+				res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
+				res.NewAttrs(res.NewAttrs(), "-VersionPriority", "VersionName")
+			}
+
+			if IsPublishReadyableModel(res.Value) || IsSchedulableModel(res.Value) || IsVersionableModel(res.Value) {
+				if res.GetMeta("PublishLiveNow") == nil {
+					res.Meta(&admin.Meta{
+						Name:  "PublishLiveNow",
+						Label: "Live Now",
+						Type:  "publish_live_now",
+						Valuer: func(interface{}, *qor.Context) interface{} {
+							return ""
+						},
+					})
+				}
+
+				res.IndexAttrs(res.IndexAttrs(), "PublishLiveNow")
+				res.EditAttrs(res.EditAttrs(), "-PublishLiveNow")
+				res.NewAttrs(res.NewAttrs(), "-PublishLiveNow")
 			}
 
 			if IsShareableVersionModel(res.Value) {
-				res.Meta(&admin.Meta{
-					Name: "VersionName",
-					Type: "hidden",
-					Valuer: func(record interface{}, context *qor.Context) interface{} {
-						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-							return shareableVersion.GetSharedVersionName()
-						}
-						return ""
-					},
-					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-					},
-				})
-
-				res.Meta(&admin.Meta{
-					Name: "ShareableVersion",
-					Type: "string",
-					Valuer: func(record interface{}, context *qor.Context) interface{} {
-						if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-							return shareableVersion.GetSharedVersionName() != ""
-						}
-						return false
-					},
-					Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-						if utils.ToString(metaValue.Value) == "true" {
+				if res.GetMeta("VersionName") == nil {
+					res.Meta(&admin.Meta{
+						Name: "VersionName",
+						Type: "hidden",
+						Valuer: func(record interface{}, context *qor.Context) interface{} {
 							if shareableVersion, ok := record.(ShareableVersionInterface); ok {
-								versionName := context.Request.Form.Get("QorResource.VersionName")
-								shareableVersion.SetSharedVersionName(versionName)
+								return shareableVersion.GetSharedVersionName()
 							}
-						}
-					},
-				})
+							return ""
+						},
+						Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+						},
+					})
+				}
+
+				if res.GetMeta("ShareableVersion") == nil {
+					res.Meta(&admin.Meta{
+						Name: "ShareableVersion",
+						Type: "string",
+						Valuer: func(record interface{}, context *qor.Context) interface{} {
+							if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+								return shareableVersion.GetSharedVersionName() != ""
+							}
+							return false
+						},
+						Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+							if utils.ToString(metaValue.Value) == "true" {
+								if shareableVersion, ok := record.(ShareableVersionInterface); ok {
+									versionName := context.Request.Form.Get("QorResource.VersionName")
+									shareableVersion.SetSharedVersionName(versionName)
+								}
+							}
+						},
+					})
+				}
 			}
 
 			res.GetAdmin().RegisterFuncMap("get_schedule_event", func(record interface{}, context *admin.Context) interface{} {
@@ -166,7 +185,7 @@ func enablePublishMode(res resource.Resourcer) {
 				return context.Admin.GetResource("ScheduledEvent")
 			})
 
-			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
+			getVersionsCount := func(record interface{}, context *admin.Context) interface{} {
 				var (
 					count        int
 					db           = context.GetDB().Set(VersionNameMode, "").Set(VersionMode, VersionMultipleMode)
@@ -175,6 +194,45 @@ func enablePublishMode(res resource.Resourcer) {
 				)
 				db.Set(admin.DisableCompositePrimaryKeyMode, "on").Model(context.Resource.NewStruct()).Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).Count(&count)
 				return count
+			}
+
+			res.GetAdmin().RegisterFuncMap("get_new_version_name", func(record interface{}, context *admin.Context) interface{} {
+				return fmt.Sprintf("v%v", getVersionsCount(record, context))
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_publish_schedule_time", func(context *admin.Context) interface{} {
+				return getPublishScheduleTime(context.Context)
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_requesting_publish_draft_content", func(context *admin.Context) interface{} {
+				return requestingPublishDraftContent(context.Context)
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_versions_count", func(record interface{}, context *admin.Context) interface{} {
+				return getVersionsCount(record, context)
+			})
+
+			res.GetAdmin().RegisterFuncMap("get_live_status", func(record interface{}, context *admin.Context) interface{} {
+				var (
+					db           = context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(ScheduleMode, "on").Set(VersionMode, "on").Set(VisibleMode, "on").Set(VersionNameMode, "").Set(ScheduledTime, "").Set(ScheduledStart, "").Set(ScheduledEnd, "")
+					scope        = db.NewScope(record)
+					primaryField = scope.PrimaryField()
+					newrecord    = reflect.New(utils.ModelType(record)).Interface()
+				)
+
+				if !db.First(newrecord, fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), primaryField.Field.Interface()).RecordNotFound() {
+					if oldVersion, ok := record.(VersionableInterface); ok {
+						if versionable, ok := newrecord.(VersionableInterface); ok {
+							if oldVersion.GetVersionName() == versionable.GetVersionName() {
+								return "live"
+							}
+							return "available"
+						}
+					}
+					return "live"
+				}
+
+				return ""
 			})
 		}
 	}
@@ -253,9 +311,11 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 					}
 				}
 
-				for key, value := range context.Request.URL.Query() {
+				for key, values := range context.Request.URL.Query() {
 					if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
-						tx = tx.Set(VersionNameMode, value)
+						if len(values) > 0 {
+							tx = tx.Set(VersionNameMode, values[0])
+						}
 					}
 				}
 
