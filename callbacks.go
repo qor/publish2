@@ -58,7 +58,7 @@ func IsPublishReadyableModel(model interface{}) (ok bool) {
 func RegisterCallbacks(db *gorm.DB) {
 	db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
 	db.Callback().Query().After("gorm:preload").Register("publish:fix_preload", fixPreloadCallback)
-	db.Callback().RowQuery().Before("gorm:query").Register("publish:query", queryCallback)
+	db.Callback().RowQuery().Before("gorm:row_query").Register("publish:query", queryCallback)
 
 	db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
 	db.Callback().Update().Before("gorm:begin_transaction").Register("publish:versions", updateCallback)
