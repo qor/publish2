@@ -72,7 +72,7 @@
           </label>
 
           <div class="qor-field__edit qor-field__datetimepicker">
-            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-start" data-start-date="true" data-action-type="scheduledstart" placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledStartAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledStartAtMeta)}}disabled{{end}}>
+            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-start" data-start-date="true" data-action-type="scheduledstart" placeholder="{{meta_placeholder $scheduledStartAtMeta $context "YYYY-MM-DD HH:MM"}}" type="text" value="{{render_meta $result $scheduledStartAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledStartAtMeta)}}disabled{{end}}>
             <div class="qor-action__picker-button" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}style="display:none"{{end}}{{end}}>
               <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
                 <i class="material-icons">date_range</i>
@@ -96,7 +96,7 @@
           </label>
 
           <div class="qor-field__edit qor-field__datetimepicker">
-            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-end" data-start-date="true" data-action-type="scheduledend"  placeholder="YYYY-MM-DD HH:MM" type="text" value="{{render_meta $result $scheduledEndAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledEndAtMeta)}}disabled{{end}}>
+            <input class="mdl-textfield__input qor-datetimepicker__input qor-pulish2__action-input qor-pulish2__action-end" data-start-date="true" data-action-type="scheduledend"  placeholder="{{meta_placeholder $scheduledEndAtMeta $context "YYYY-MM-DD HH:MM"}}" type="text" value="{{render_meta $result $scheduledEndAtMeta}}" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}disabled{{end}}{{else if not (has_update_permission $scheduledEndAtMeta)}}disabled{{end}}>
             <div class="qor-action__picker-button" {{if $scheduleEventIDMeta}}{{if $scheduleEvent.ID}}style="display:none"{{end}}{{end}}>
               <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
                 <i class="material-icons">date_range</i>

@@ -1,4 +1,5 @@
 {{$resource := .Resource}}
+{{$context := .}}
 {{$scheduledStartAtMeta := $resource.GetMeta "ScheduledStartAt"}}
 
 {{if $scheduledStartAtMeta}}
@@ -37,7 +38,7 @@
       <div class="qor-field__edit qor-field__datetimepicker">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label"></label>
-          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__start" data-search-param="schedule_start_at" placeholder="{{meta_label $scheduleStartAtMeta}}" type="text" value="" />
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__start" data-search-param="schedule_start_at" placeholder="{{meta_placeholder $scheduleStartAtMeta $context $scheduleStartAtMeta.Label}}" type="text" value="" />
         </div>
         <div>
           <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
@@ -53,7 +54,7 @@
       <div class="qor-field__edit qor-field__datetimepicker">
         <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
           <label class="qor-field__label mdl-textfield__label"></label>
-          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__end" data-search-param="schedule_end_at" placeholder="{{meta_label $scheduleEndAtMeta}}" type="text" value="" />
+          <input class="mdl-textfield__input qor-datetimepicker__input qor-filter__end" data-search-param="schedule_end_at" placeholder="{{meta_placeholder $scheduleEndAtMeta $context $scheduleEndAtMeta.Label}}" type="text" value="" />
         </div>
         <div>
           <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
