@@ -139,6 +139,9 @@ tr.is-showing {
 .qor-pulish2__action {
     display: none;
     margin-bottom: 0 !important;
+    .qor-pulish2__eventid {
+        padding-top: 0;
+    }
     .qor-pulish2__action-input:disabled {
         color: #999;
     }
