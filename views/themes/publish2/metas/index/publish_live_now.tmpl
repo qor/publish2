@@ -1,13 +1,15 @@
 {{$live_status := (get_live_status .ResourceValue .Context)}}
-{{if $live_status}}
+
   <span class="qor-publish2__live">
+  {{if $live_status}}
     {{if eq $live_status "live"}}
       <span class="qor-symbol qor-symbol-blue" title="{{t "qor_admin.publish.hint.this_version_is_live" "This version is live"}}"></span>
     {{else if eq $live_status "available"}}
       <span class="qor-symbol qor-symbol-yellow" title="{{t "qor_admin.publish.hint.view_all_versions_to_see_which_is_live" "View all versions to see which is live"}}"></span>
     {{end}}
+  {{end}}
   </span>
-{{end}}
+
 
 <span class="qor-publish2__button">
   {{if (gt (get_versions_count .ResourceValue .Context) 1)}}
