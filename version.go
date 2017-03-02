@@ -3,7 +3,7 @@ package publish2
 var DefaultVersionName = "Default"
 
 type Version struct {
-	VersionName     string `gorm:"primary_key;size:191"`
+	VersionName     string `gorm:"primary_key;size:128"`
 	VersionPriority string `gorm:"index"`
 }
 
@@ -21,7 +21,7 @@ type VersionableInterface interface {
 }
 
 type SharedVersion struct {
-	VersionName string `gorm:"primary_key;size:191"`
+	VersionName string `gorm:"primary_key;size:128"`
 }
 
 func (version *SharedVersion) SetSharedVersionName(name string) {
