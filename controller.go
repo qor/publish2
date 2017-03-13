@@ -1,7 +1,6 @@
 package publish2
 
 import (
-	"fmt"
 	"html/template"
 
 	"github.com/qor/admin"
@@ -61,7 +60,8 @@ func (ctr controller) Dashboard(context *admin.Context) {
 
 func (ctr controller) Versions(context *admin.Context) {
 	records := context.Resource.NewSlice()
-	context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(VersionMode, VersionMultipleMode).Set(ScheduleMode, ModeOff).Set(VisibleMode, ModeOff).Find(records, fmt.Sprintf("%v = ?", context.Resource.PrimaryDBName()), context.ResourceID)
+	primaryQuerySQL, primaryParams := ctr.Resource.ToPrimaryQueryParams(context.ResourceID, context.Context)
+	context.GetDB().Set(admin.DisableCompositePrimaryKeyMode, "on").Set(VersionMode, VersionMultipleMode).Set(ScheduleMode, ModeOff).Set(VisibleMode, ModeOff).Where(primaryQuerySQL, primaryParams...).Find(records)
 
 	result := context.Funcs(template.FuncMap{
 		"version_metas": func() (metas []*admin.Meta) {
