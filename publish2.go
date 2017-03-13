@@ -311,10 +311,21 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 					}
 				}
 
-				for key, values := range context.Request.URL.Query() {
-					if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
-						if len(values) > 0 {
-							tx = tx.Set(VersionNameMode, values[0])
+				if res := context.Resource; res != nil {
+					for idx, primaryField := range res.PrimaryFields {
+						if primaryField.Name == "VersionName" {
+							_, params := res.ToPrimaryQueryParams(res.GetPrimaryValue(context.Request), context.Context)
+							if len(params) > idx {
+								tx = tx.Set(VersionNameMode, params[idx])
+							}
+						}
+					}
+				} else {
+					for key, values := range context.Request.URL.Query() {
+						if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
+							if len(values) > 0 {
+								tx = tx.Set(VersionNameMode, values[0])
+							}
 						}
 					}
 				}
