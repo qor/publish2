@@ -95,7 +95,7 @@ func enablePublishMode(res resource.Resourcer) {
 
 				router := res.GetAdmin().GetRouter()
 				ctr := controller{Resource: res}
-				router.Get(path.Join(res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
+				router.Get(path.Join(res.RoutePrefix(), res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
 
 				res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
 				res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
@@ -261,11 +261,11 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 		}
 
 		Admin := res.GetAdmin()
-
-		if res.GetAdmin().GetResource("ScheduledEvent") == nil {
+		if Admin.GetResource("ScheduledEvent") == nil {
 			Admin.AddResource(&ScheduledEvent{}, &admin.Config{Name: "Event", Menu: res.Config.Menu, Priority: -1})
 			Admin.Config.DB.AutoMigrate(&ScheduledEvent{})
 		}
+
 		scheduledEventResource := res.GetAdmin().GetResource("ScheduledEvent")
 		scheduledEventResource.AddProcessor(func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
 			var (
@@ -294,52 +294,54 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 			return nil
 		})
 
-		Admin.GetRouter().Use(&admin.Middleware{
-			Name: "publish2",
-			Handler: func(context *admin.Context, middleware *admin.Middleware) {
-				tx := context.GetDB()
+		if Admin.GetRouter().GetMiddleware("publish2") == nil {
+			Admin.GetRouter().Use(&admin.Middleware{
+				Name: "publish2",
+				Handler: func(context *admin.Context, middleware *admin.Middleware) {
+					tx := context.GetDB()
 
-				if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
-					if t, err := utils.ParseTime(startAt, context.Context); err == nil {
-						tx = tx.Set(ScheduledStart, t).Set(VersionMode, VersionMultipleMode)
+					if startAt := context.Request.URL.Query().Get("schedule_start_at"); startAt != "" {
+						if t, err := utils.ParseTime(startAt, context.Context); err == nil {
+							tx = tx.Set(ScheduledStart, t).Set(VersionMode, VersionMultipleMode)
+						}
 					}
-				}
 
-				if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
-					if t, err := utils.ParseTime(endAt, context.Context); err == nil {
-						tx = tx.Set(ScheduledEnd, t).Set(VersionMode, VersionMultipleMode)
+					if endAt := context.Request.URL.Query().Get("schedule_end_at"); endAt != "" {
+						if t, err := utils.ParseTime(endAt, context.Context); err == nil {
+							tx = tx.Set(ScheduledEnd, t).Set(VersionMode, VersionMultipleMode)
+						}
 					}
-				}
 
-				if res := context.Resource; res != nil {
-					for idx, primaryField := range res.PrimaryFields {
-						if primaryField.Name == "VersionName" {
-							_, params := res.ToPrimaryQueryParams(res.GetPrimaryValue(context.Request), context.Context)
-							if len(params) > idx {
-								tx = tx.Set(VersionNameMode, params[idx])
+					if res := context.Resource; res != nil {
+						for idx, primaryField := range res.PrimaryFields {
+							if primaryField.Name == "VersionName" {
+								_, params := res.ToPrimaryQueryParams(res.GetPrimaryValue(context.Request), context.Context)
+								if len(params) > idx {
+									tx = tx.Set(VersionNameMode, params[idx])
+								}
+							}
+						}
+					} else {
+						for key, values := range context.Request.URL.Query() {
+							if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
+								if len(values) > 0 {
+									tx = tx.Set(VersionNameMode, values[0])
+								}
 							}
 						}
 					}
-				} else {
-					for key, values := range context.Request.URL.Query() {
-						if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
-							if len(values) > 0 {
-								tx = tx.Set(VersionNameMode, values[0])
-							}
-						}
+
+					if versionName := context.Request.URL.Query().Get("version_name"); versionName != "" {
+						tx = tx.Set(VersionNameMode, versionName)
 					}
-				}
 
-				if versionName := context.Request.URL.Query().Get("version_name"); versionName != "" {
-					tx = tx.Set(VersionNameMode, versionName)
-				}
+					context.SetDB(tx)
+					middleware.Next(context)
+				},
+			})
 
-				context.SetDB(tx)
-				middleware.Next(context)
-			},
-		})
-
-		ctr := controller{Resource: res}
-		Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
+			ctr := controller{Resource: res}
+			Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
+		}
 	}
 }
