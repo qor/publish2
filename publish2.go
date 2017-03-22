@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 
+	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -312,20 +313,41 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 						}
 					}
 
+					usingVersionNameAsPrimaryKey := false
 					if res := context.Resource; res != nil {
 						for idx, primaryField := range res.PrimaryFields {
 							if primaryField.Name == "VersionName" {
 								_, params := res.ToPrimaryQueryParams(res.GetPrimaryValue(context.Request), context.Context)
 								if len(params) > idx {
-									tx = tx.Set(VersionNameMode, params[idx])
+									usingVersionNameAsPrimaryKey = true
+									tx = tx.Scopes(func(db *gorm.DB) *gorm.DB {
+										if db.Value == nil {
+											return db.Set(VersionNameMode, params[idx])
+										} else if utils.ModelType(res.Value).String() == utils.ModelType(db.Value).String() {
+											return db.Set(VersionNameMode, params[idx])
+										}
+										return db
+									})
+									break
 								}
 							}
 						}
-					} else {
+					}
+
+					if !usingVersionNameAsPrimaryKey {
+						versionNameRegexp := regexp.MustCompile(`primary_key\[(.+)_version_name\]`)
 						for key, values := range context.Request.URL.Query() {
-							if regexp.MustCompile(`primary_key\[.+_version_name\]`).MatchString(key) {
+							if versionNameRegexp.MatchString(key) {
+								matches := versionNameRegexp.FindStringSubmatch(key)
 								if len(values) > 0 {
-									tx = tx.Set(VersionNameMode, values[0])
+									tx = tx.Scopes(func(db *gorm.DB) *gorm.DB {
+										if db.Value == nil {
+											return db.Set(VersionNameMode, values[0])
+										} else if matches[1] == utils.ModelType(db.Value).String() {
+											return db.Set(VersionNameMode, values[0])
+										}
+										return db
+									})
 								}
 							}
 						}
