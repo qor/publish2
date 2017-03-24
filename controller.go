@@ -40,12 +40,12 @@ func (ctr controller) Dashboard(context *admin.Context) {
 			result := resourceResult{Resource: res}
 
 			comingOnlineData := res.NewSlice()
-			if db.Set(VisibleMode, "").Set(ScheduleMode, ComingOnlineMode).Set(VersionMode, VersionMultipleMode).Find(comingOnlineData).RowsAffected > 0 {
+			if db.Set(VisibleMode, "on").Set(ScheduleMode, ComingOnlineMode).Set(VersionMode, VersionMultipleMode).Find(comingOnlineData).RowsAffected > 0 {
 				result.ComingOnlineResults = comingOnlineData
 			}
 
 			goingOfflineData := res.NewSlice()
-			if db.Set(VisibleMode, "").Set(ScheduleMode, GoingOfflineMode).Set(VersionMode, VersionMultipleMode).Find(goingOfflineData).RowsAffected > 0 {
+			if db.Set(VisibleMode, "on").Set(ScheduleMode, GoingOfflineMode).Set(VersionMode, VersionMultipleMode).Find(goingOfflineData).RowsAffected > 0 {
 				result.GoingOfflineResults = goingOfflineData
 			}
 
