@@ -96,7 +96,7 @@ func enablePublishMode(res resource.Resourcer) {
 
 				router := res.GetAdmin().GetRouter()
 				ctr := controller{Resource: res}
-				router.Get(path.Join(res.RoutePrefix(), res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, admin.RouteConfig{Resource: res})
+				router.Get(path.Join(res.RoutePrefix(), res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, &admin.RouteConfig{Resource: res})
 
 				res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
 				res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
@@ -363,7 +363,7 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 			})
 
 			ctr := controller{Resource: res}
-			Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, admin.RouteConfig{Resource: res})
+			Admin.GetRouter().Get(res.ToParam(), ctr.Dashboard, &admin.RouteConfig{Resource: res})
 		}
 	}
 }
