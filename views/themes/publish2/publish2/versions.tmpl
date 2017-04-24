@@ -23,7 +23,7 @@
 
           <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="actions-for-{{$result.GetVersionName}}">
             <li class="mdl-menu__item" qor-icon-name="Delete">
-              <a class="qor-action--button" data-url="{{$recordURL}}" data-ajax-form="true" data-from-menu="true" data-confirm="{{t "qor_admin.form.are_you_sure" "Are You Sure?"}}" data-confirm-ok="{{t "qor_admin.form.confirm.button.delete" "delete"}}" data-confirm-cancel="{{t "qor_admin.form.confirm.button.cancel" "cancel"}}" data-method="DELETE">
+              <a class="qor-action--button" data-url="{{$recordURL}}" data-ajax-form="true" data-from-menu="true" data-confirm="{{t "qor_publish2.confirm.are_you_sure" "Are You Sure?"}}" data-confirm-ok="{{t "qor_publish2.confirm.delete" "delete"}}" data-confirm-cancel="{{t "qor_publish2.confirm.cancel" "cancel"}}" data-method="DELETE">
                 {{t (printf "qor_publish.actions.%v" $resource.ToParam "delete") "Delete"}}
               </a>
             </li>
