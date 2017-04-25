@@ -140,7 +140,7 @@ tr.is-showing {
 
 .qor-pulish2__action {
     display: none;
-    margin-bottom: 0 !important;
+    margin: 0 0 24px;
     .qor-pulish2__eventid {
         padding-top: 0;
     }
@@ -208,4 +208,8 @@ tr.qor-table__inner-list {
     .qor-symbol-yellow {
         display: none !important;
     }
+}
+
+.qor-page__show .qor-pulish2__action .qor-field__edit {
+    display: block;
 }

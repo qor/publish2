@@ -87,8 +87,8 @@
         },
 
         initActionTemplate: function() {
-            if (!$(CLASS_PUBLISH_ACTION).closest('.qor-slideout').size()) {
-                $(CLASS_PUBLISH_ACTION).prependTo($('.mdl-layout__content .qor-page__body')).show();
+            if (!$(CLASS_PUBLISH_ACTION).closest('.qor-slideout').length) {
+                $(CLASS_PUBLISH_ACTION).prependTo($('.mdl-layout__content .qor-page__body form').first()).show();
             }
             QorPublish2.initSharedVersion();
         },
@@ -264,13 +264,18 @@
             $types = $action.find('[data-action-type]'),
             element = QorPublish2.ELEMENT;
 
-        if (!$action.size() || !$types.size()) {
+        // move publsh2 actions into slideout form tag
+        if ($action.length) {
+            $action.prependTo($('.qor-slideout__body form').first());
+        }
+
+        if (!$action.length || !$types.length) {
             return;
         }
 
         $types.each(function() {
             var $this = $(this);
-            $(element[$this.data().actionType]).closest('.qor-form-section').hide();
+            $(element[$this.data('actionType')]).closest('.qor-form-section').hide();
         });
 
         $(CLASS_PUBLISH_ACTION_INPUT).trigger(EVENT_CHANGE);
