@@ -77,7 +77,9 @@
 
         initActionTemplate: function() {
             if (!$(CLASS_PUBLISH_ACTION).closest('.qor-slideout').length) {
-                $(CLASS_PUBLISH_ACTION).prependTo($('.mdl-layout__content .qor-page__body form').first()).show();
+                $(CLASS_PUBLISH_ACTION)
+                    .prependTo($('.mdl-layout__content .qor-page__body form').first())
+                    .show();
             }
             QorPublish2.initSharedVersion();
         },
@@ -130,7 +132,10 @@
                 $input.attr('disabled', true);
             } else {
                 $button.show();
-                $input.attr('disabled', false).closest('.is-disabled').removeClass('is-disabled');
+                $input
+                    .attr('disabled', false)
+                    .closest('.is-disabled')
+                    .removeClass('is-disabled');
             }
 
             $start.trigger('change');
@@ -147,9 +152,7 @@
                 $list,
                 $newRow = $('<tr class="' + VERSION_LIST + '"><td colspan="' + colspan + '"></td></tr>'),
                 $version = $(
-                    '<div class="' +
-                        VERSION_BLOCK +
-                        '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>'
+                    '<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>'
                 );
 
             if ($tr.hasClass(IS_SHOW_VERSION)) {
@@ -187,7 +190,11 @@
 
             url &&
                 $.get(url, function(html) {
-                    $(CLASS_VERSION_BLOCK).html(html).trigger('enable');
+                    $(CLASS_VERSION_BLOCK)
+                        .html(html)
+                        .find('table')
+                        .removeClass('mdl-js-data-table mdl-data-table')
+                        .trigger('enable');
                 });
 
             return false;
@@ -265,7 +272,9 @@
 
         $types.each(function() {
             var $this = $(this);
-            $(element[$this.data('actionType')]).closest('.qor-form-section').hide();
+            $(element[$this.data('actionType')])
+                .closest('.qor-form-section')
+                .hide();
         });
 
         $(CLASS_PUBLISH_ACTION_INPUT).trigger(EVENT_CHANGE);
