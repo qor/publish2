@@ -192,8 +192,6 @@
                 $.get(url, function(html) {
                     $(CLASS_VERSION_BLOCK)
                         .html(html)
-                        .find('table')
-                        .removeClass('mdl-js-data-table mdl-data-table')
                         .trigger('enable');
                 });
 
