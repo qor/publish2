@@ -255,13 +255,19 @@
     $.fn.qorSliderAfterShow.initSharedVersion = QorPublish2.initSharedVersion;
 
     $.fn.qorSliderAfterShow.initPublishForm = function() {
-        var $action = $(CLASS_PUBLISH_ACTION),
+        let $action = $(CLASS_PUBLISH_ACTION),
             $types = $action.find('[data-action-type]'),
+            $slideoutForm = $('.qor-slideout__body form'),
+            $bottomsheetForm = $('.qor-bottomsheets__body form'),
             element = QorPublish2.ELEMENT;
 
         // move publsh2 actions into slideout form tag
         if ($action.length) {
-            $action.prependTo($('.qor-slideout__body form').first());
+            if ($bottomsheetForm.length) {
+                $action.prependTo($bottomsheetForm.first());
+            } else if ($slideoutForm.length) {
+                $action.prependTo($slideoutForm.first());
+            }
         }
 
         if (!$action.length || !$types.length) {
