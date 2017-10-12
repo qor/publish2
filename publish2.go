@@ -39,9 +39,15 @@ func enablePublishMode(res resource.Resourcer) {
 			res.UseTheme("publish2")
 
 			if IsPublishReadyableModel(res.Value) {
-				res.IndexAttrs(res.IndexAttrs(), "-PublishReady")
-				res.EditAttrs(res.EditAttrs(), "PublishReady")
-				res.NewAttrs(res.NewAttrs(), "PublishReady")
+				res.OverrideIndexAttrs(func() {
+					res.IndexAttrs(res.IndexAttrs(), "-PublishReady")
+				})
+				res.OverrideEditAttrs(func() {
+					res.EditAttrs(res.EditAttrs(), "PublishReady")
+				})
+				res.OverrideNewAttrs(func() {
+					res.NewAttrs(res.NewAttrs(), "PublishReady")
+				})
 			}
 
 			if IsSchedulableModel(res.Value) {
@@ -51,9 +57,15 @@ func enablePublishMode(res resource.Resourcer) {
 					Type:  "hidden",
 				})
 
-				res.IndexAttrs(res.IndexAttrs(), "-ScheduledEventID")
-				res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
-				res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
+				res.OverrideIndexAttrs(func() {
+					res.IndexAttrs(res.IndexAttrs(), "-ScheduledEventID")
+				})
+				res.OverrideEditAttrs(func() {
+					res.EditAttrs(res.EditAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
+				})
+				res.OverrideNewAttrs(func() {
+					res.NewAttrs(res.NewAttrs(), "ScheduledStartAt", "ScheduledEndAt", "ScheduledEventID")
+				})
 
 				if res.GetAdmin().GetResource(utils.ModelType(&Publish{}).Name()) == nil {
 					res.GetAdmin().AddResource(&Publish{})
@@ -92,9 +104,15 @@ func enablePublishMode(res resource.Resourcer) {
 				ctr := controller{Resource: res}
 				router.Get(path.Join(res.RoutePrefix(), res.ToParam(), res.ParamIDName(), "versions"), ctr.Versions, &admin.RouteConfig{Resource: res})
 
-				res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
-				res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
-				res.NewAttrs(res.NewAttrs(), "-VersionPriority", "VersionName")
+				res.OverrideIndexAttrs(func() {
+					res.IndexAttrs(res.IndexAttrs(), "-VersionPriority")
+				})
+				res.OverrideEditAttrs(func() {
+					res.EditAttrs(res.EditAttrs(), "-VersionPriority", "VersionName")
+				})
+				res.OverrideNewAttrs(func() {
+					res.NewAttrs(res.NewAttrs(), "-VersionPriority", "VersionName")
+				})
 			}
 
 			if IsPublishReadyableModel(res.Value) || IsSchedulableModel(res.Value) || IsVersionableModel(res.Value) {
@@ -107,9 +125,15 @@ func enablePublishMode(res resource.Resourcer) {
 					},
 				})
 
-				res.IndexAttrs(res.IndexAttrs(), "PublishLiveNow")
-				res.EditAttrs(res.EditAttrs(), "-PublishLiveNow")
-				res.NewAttrs(res.NewAttrs(), "-PublishLiveNow")
+				res.OverrideIndexAttrs(func() {
+					res.IndexAttrs(res.IndexAttrs(), "PublishLiveNow")
+				})
+				res.OverrideEditAttrs(func() {
+					res.EditAttrs(res.EditAttrs(), "-PublishLiveNow")
+				})
+				res.OverrideNewAttrs(func() {
+					res.NewAttrs(res.NewAttrs(), "-PublishLiveNow")
+				})
 			}
 
 			if IsShareableVersionModel(res.Value) {
