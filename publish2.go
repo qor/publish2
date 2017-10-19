@@ -276,7 +276,7 @@ func (Publish) ConfigureQorResourceBeforeInitialize(res resource.Resourcer) {
 		Admin := res.GetAdmin()
 		if Admin.GetResource("ScheduledEvent") == nil {
 			Admin.AddResource(&ScheduledEvent{}, &admin.Config{Name: "Event", Menu: res.Config.Menu, Priority: -1})
-			Admin.Config.DB.AutoMigrate(&ScheduledEvent{})
+			Admin.DB.AutoMigrate(&ScheduledEvent{})
 		}
 
 		scheduledEventResource := res.GetAdmin().GetResource("ScheduledEvent")
