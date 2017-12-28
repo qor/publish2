@@ -56,14 +56,26 @@ func IsPublishReadyableModel(model interface{}) (ok bool) {
 }
 
 func RegisterCallbacks(db *gorm.DB) {
-	db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
-	db.Callback().Query().After("gorm:preload").Register("publish:fix_preload", fixPreloadCallback)
-	db.Callback().RowQuery().Before("gorm:row_query").Register("publish:query", queryCallback)
+	if db.Callback().Query().Get("publish:query") == nil {
+		db.Callback().Query().Before("gorm:query").Register("publish:query", queryCallback)
+	}
+	if db.Callback().Query().Get("publish:fix_preload") == nil {
+		db.Callback().Query().After("gorm:preload").Register("publish:fix_preload", fixPreloadCallback)
+	}
+	if db.Callback().RowQuery().Get("publish:query") == nil {
+		db.Callback().RowQuery().Before("gorm:row_query").Register("publish:query", queryCallback)
+	}
 
-	db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
-	db.Callback().Update().Before("gorm:begin_transaction").Register("publish:versions", updateCallback)
+	if db.Callback().Create().Get("publish:versions") == nil {
+		db.Callback().Create().Before("gorm:begin_transaction").Register("publish:versions", createCallback)
+	}
+	if db.Callback().Update().Get("publish:versions") == nil {
+		db.Callback().Update().Before("gorm:begin_transaction").Register("publish:versions", updateCallback)
+	}
 
-	db.Callback().Delete().Before("gorm:begin_transaction").Register("publish:versions", deleteCallback)
+	if db.Callback().Delete().Get("publish:versions") == nil {
+		db.Callback().Delete().Before("gorm:begin_transaction").Register("publish:versions", deleteCallback)
+	}
 }
 
 func queryCallback(scope *gorm.Scope) {
