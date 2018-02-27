@@ -29,11 +29,6 @@
         CLASS_VERSION_BLOCK = '.' + VERSION_BLOCK,
         CLASS_EVENT_ID = '.qor-pulish2__eventid',
         CLASS_EVENT_INPUT = '.qor-pulish2__eventid-input',
-        CLASS_PUBLISH_READY = '[name="QorResource.PublishReady"]',
-        CLASS_SCHEDULED_STARTAT = '[name="QorResource.ScheduledStartAt"]',
-        CLASS_SCHEDULED_ENDAT = '[name="QorResource.ScheduledEndAt"]',
-        CLASS_PUBLISH_VERSIONNAME = '[name="QorResource.VersionName"]',
-        CLASS_PUBLISH_EVENTID = '[name="QorResource.ScheduledEventID"]',
         CLASS_PUBLISH_ACTION = '.qor-pulish2__action',
         CLASS_PUBLISH_ACTION_SHAREDVERSION = '.qor-pulish2__action-sharedversion',
         CLASS_PUBLISH_ACTION_START = '.qor-pulish2__action-start',
@@ -69,10 +64,10 @@
 
         unbind: function() {
             $document
-                .off(EVENT_CLICK, CLASS_VERSION_LINK, this.loadPublishVersion.bind(this))
-                .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT, this.action.bind(this))
-                .off(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID, this.eventidChanged.bind(this))
-                .off(EVENT_REPLICATOR_ADDED, this.replicatorAdded.bind(this));
+                .off(EVENT_CLICK, CLASS_VERSION_LINK)
+                .off(EVENT_CHANGE, CLASS_PUBLISH_ACTION_INPUT)
+                .off(EVENT_SELECTONE_SELECTED, CLASS_EVENT_ID)
+                .off(EVENT_REPLICATOR_ADDED);
         },
 
         initActionTemplate: function() {
@@ -151,9 +146,7 @@
                 isMediaLibrary = $table.hasClass(IS_MEDIALIBRARY),
                 $list,
                 $newRow = $('<tr class="' + VERSION_LIST + '"><td colspan="' + colspan + '"></td></tr>'),
-                $version = $(
-                    '<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>'
-                );
+                $version = $('<div class="' + VERSION_BLOCK + '"><div style="text-align: center;"><div class="mdl-spinner mdl-js-spinner is-active"></div></div></div>');
 
             if ($tr.hasClass(IS_SHOW_VERSION)) {
                 $(CLASS_VERSION_LIST).remove();
@@ -252,6 +245,8 @@
         QorPublish2.generateSharedVersionLabel();
     };
 
+    $.fn.qorSliderAfterShow = $.fn.qorSliderAfterShow || {};
+
     $.fn.qorSliderAfterShow.initSharedVersion = QorPublish2.initSharedVersion;
 
     $.fn.qorSliderAfterShow.initPublishForm = function() {
@@ -287,11 +282,11 @@
     QorPublish2.DEFAULTS = {};
 
     QorPublish2.ELEMENT = {
-        scheduledstart: CLASS_SCHEDULED_STARTAT,
-        scheduledend: CLASS_SCHEDULED_ENDAT,
-        publishready: CLASS_PUBLISH_READY,
-        versionname: CLASS_PUBLISH_VERSIONNAME,
-        eventid: CLASS_PUBLISH_EVENTID
+        scheduledstart: '[name="QorResource.ScheduledStartAt"]',
+        scheduledend: '[name="QorResource.ScheduledEndAt"]',
+        publishready: '[name="QorResource.PublishReady"]',
+        versionname: '[name="QorResource.VersionName"]',
+        eventid: '[name="QorResource.ScheduledEventID"]'
     };
 
     QorPublish2.plugin = function(options) {
