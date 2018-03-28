@@ -18,7 +18,7 @@
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_CHANGE = 'change.' + NAMESPACE,
         EVENT_SELECTONE_SELECTED = 'qor.selectone.selected qor.selectone.unselected',
-        EVENT_REPLICATOR_ADDED = 'added.qor.replicator',
+        EVENT_REPLICATOR_ADDED = 'added.qor.replicator.publish2',
         // sharedable version input name, please change this if adjust name in template !!
         // <input name="QorResource.ColorVariations[0].SizeVariations[0].ShareableVersion" />
         NAME_SHAREABLEVERSION = 'ShareableVersion',
@@ -30,7 +30,6 @@
         CLASS_EVENT_ID = '.qor-pulish2__eventid',
         CLASS_EVENT_INPUT = '.qor-pulish2__eventid-input',
         CLASS_PUBLISH_ACTION = '.qor-pulish2__action',
-        CLASS_PUBLISH_ACTION_SHAREDVERSION = '.qor-pulish2__action-sharedversion',
         CLASS_PUBLISH_ACTION_START = '.qor-pulish2__action-start',
         CLASS_PUBLISH_ACTION_END = '.qor-pulish2__action-end',
         CLASS_PUBLISH_ACTION_INPUT = '.qor-pulish2__action-input',
@@ -198,7 +197,7 @@
     };
 
     QorPublish2.generateSharedVersionLabel = function($element) {
-        var sharedVersion = $('[name="shared-version-checkbox"]').html(),
+        let sharedVersion = $('[name="shared-version-checkbox"]').html(),
             $inputs = $('input[name$="' + NAME_SHAREABLEVERSION + '"]'),
             data = {},
             randomString;
@@ -208,16 +207,12 @@
         }
 
         $inputs.each(function() {
-            var $input = $(this),
+            let $input = $(this),
                 $field = $input.closest('.qor-fieldset'),
                 $template;
 
-            if ($field.hasClass('.qor-fieldset--new')) {
+            if ($field.hasClass('qor-fieldset--new')) {
                 return;
-            }
-
-            if ($element) {
-                $field.find(CLASS_PUBLISH_ACTION_SHAREDVERSION).remove();
             }
 
             randomString = (Math.random() + 1).toString(36).substring(7);
@@ -311,7 +306,6 @@
 
     $(function() {
         var selector = '.qor-theme-publish2';
-
         var options = {};
 
         options['element'] = QorPublish2.ELEMENT;
