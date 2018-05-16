@@ -249,13 +249,16 @@
             $types = $action.find('[data-action-type]'),
             $slideoutForm = $('.qor-slideout__body form'),
             $bottomsheetForm = $('.qor-bottomsheets__body form'),
+            isInBottomsheets = $action.closest('.qor-bottomsheets').length,
+            isInSlideout = $action.closest('.qor-slideout').length,
+            $parent,
             element = QorPublish2.ELEMENT;
 
         // move publsh2 actions into slideout form tag
         if ($action.length) {
-            if ($bottomsheetForm.length) {
+            if ($bottomsheetForm.length && isInBottomsheets) {
                 $action.prependTo($bottomsheetForm.first());
-            } else if ($slideoutForm.length) {
+            } else if ($slideoutForm.length && isInSlideout) {
                 $action.prependTo($slideoutForm.first());
             }
         }
@@ -264,9 +267,16 @@
             return;
         }
 
+        if (isInSlideout) {
+            $parent = $('.qor-slideout');
+        } else if (isInBottomsheets) {
+            $parent = $('.qor-bottomsheets');
+        }
+
         $types.each(function() {
             var $this = $(this);
-            $(element[$this.data('actionType')])
+            $parent
+                .find(element[$this.data('actionType')])
                 .closest('.qor-form-section')
                 .hide();
         });
