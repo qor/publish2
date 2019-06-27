@@ -247,7 +247,7 @@
     $.fn.qorSliderAfterShow.initPublishForm = function() {
         let $action = $(CLASS_PUBLISH_ACTION),
             $types = $action.find('[data-action-type]'),
-            $slideoutForm = $('.qor-slideout__body form'),
+            $slideoutForm = $('.qor-slideout__body form.qor-form').first(),
             $bottomsheetForm = $('.qor-bottomsheets__body form'),
             isInBottomsheets = $action.closest('.qor-bottomsheets').length,
             isInSlideout = $action.closest('.qor-slideout').length,
@@ -255,6 +255,9 @@
             element = QorPublish2.ELEMENT;
 
         // move publsh2 actions into slideout form tag
+        if($slideoutForm.data("takeover-publish")){
+            return;
+        }
         if ($action.length) {
             if ($bottomsheetForm.length && isInBottomsheets) {
                 $action.prependTo($bottomsheetForm.first());
