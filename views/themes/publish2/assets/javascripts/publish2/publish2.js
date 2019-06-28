@@ -255,10 +255,7 @@
             element = QorPublish2.ELEMENT;
 
         // move publsh2 actions into slideout form tag
-        if($slideoutForm.data("takeover-publish")){
-            return;
-        }
-        if ($action.length) {
+        if ($action.length && !$slideoutForm.data("takeover-publish")) {
             if ($bottomsheetForm.length && isInBottomsheets) {
                 $action.prependTo($bottomsheetForm.first());
             } else if ($slideoutForm.length && isInSlideout) {
