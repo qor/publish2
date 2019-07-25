@@ -5,12 +5,14 @@ import (
 	"path"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
+	"github.com/qor/validations"
 )
 
 func init() {
@@ -98,6 +100,20 @@ func enablePublishMode(res resource.Resourcer) {
 						return ""
 					},
 					Modes: []string{"menu_item"},
+				})
+
+				res.AddValidator(&resource.Validator{
+					Name: "version-name-validator",
+					Handler: func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
+						if meta := metaValues.Get("VersionName"); meta != nil {
+							versionName := utils.ToString(metaValues.Get("VersionName").Value)
+							if strings.ContainsAny(versionName, `!@#$%^&*?/\<>=;`) {
+								return validations.NewError(record, "VersionName", "Invalid Version Name")
+							}
+							return nil
+						}
+						return nil
+					},
 				})
 
 				router := res.GetAdmin().GetRouter()
