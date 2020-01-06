@@ -157,6 +157,14 @@ The `VersionName` will be the primary key of the object, So if you set a new `Ve
 
 The `VersionPriority` represents the priority of current version. The rule when different versions have overlapped schedule range is, the newer the higher. For example, product A has version 1 for the Christmas(12-20 ~ 12-31) and version 2 for the New Year holiday(12-30 ~ 1-3). At 12-31, the version 2 will be the visible one.
 
+To get version work properly, You need define an extra function to your struct called `GetStatus` like this:
+
+```go
+func (yourStruct YourStruct) GetStatus() string {
+	return yourStruct.Status
+}
+```
+
 ## License
 
 Released under the [MIT License](http://opensource.org/licenses/MIT).
