@@ -1,5 +1,7 @@
 # Publish2
 
+[![Build Status](https://travis-ci.com/qor/publish2.svg?branch=master)](https://travis-ci.com/qor/publish2)
+
 The Publish2 Plugin is the successor to [Publish](https://github.com/qor/publish). It generalizes publishing using 3 important modules:
 
 * Visible: to flag an object be online/offline
