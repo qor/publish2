@@ -30,5 +30,5 @@ require (
 	github.com/qor/responder v0.0.0-20201015104727-4f3a345378c2 // indirect
 	github.com/qor/session v0.0.0-20170907035918-8206b0adab70 // indirect
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
-	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 )
